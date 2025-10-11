@@ -1,1 +1,8 @@
-pene
+requests
+dotenv
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Cors
+python-dotenv
+gunicorn # For production purposes
