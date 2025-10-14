@@ -1,29 +1,45 @@
-def main():
-    sources = get_news_srcs()
-    names = get_items_names(table)
+from dotenv import load_dotenv
+load_dotenv()
+import os
+import requests
+import json
 
-    for source in sources:
-        for name in names:   
-            latest_news = get_news_from_src(source, name)
-            store_latest_news(name, latest_news) # local: DB, json, etc..
+
+NEWS_API = os.environ.get("CARLA_API")
+api_url = f"https://newsdata.io/api/1/latest?country=pe&apikey={NEWS_API}"
+
+##Note: There is a next page keyword that contains the parameter that needs to be added to the URL
+## We need send a request to the API until nextPage is null or define a number (10 )
 
 def get_news_srcs():
-    return # all the peru news sources
+    response = requests.get(api_url)
+    if response.status_code == 200:
+        dic = response.json()
+    else:
+        print("not found")
 
-def get_items_names(table):
-    return # return the contents of the desired table
+def get_all_news():
+    next_page = ""
+    all_news = []
+    i = 0
+    while next_page is not None:
+        if next_page == "":
+            new_url = api_url
+        else:
+            new_url = api_url + "&page=" + next_page
+        response = requests.get(new_url)
 
-def get_news_from_src(source,name):
-    return # get the news from the source that have the desired name in the keywords/headers
+        if response.status_code == 200:
+            response = response.json()
+            all_news.append(response)
+            next_page = response["nextPage"]
+        else:
+            print("url not found")
+        i+=1
+    
+    for i in all_news:
+        print(i["nextPage"])
 
-def store_latest_news(name, latests_news):
-    # dataset is stored locally
 
-    # access dataset
-    dataset = dataset_connection() # connects to the dataset - write and read operations
-    dataset_update_row(name, latests_news)
-        # if latest_news:
-            # update name latest_news
-        # for any news that are not from the current week/month remove them
+get_all_news()
 
-    return # ok or not
