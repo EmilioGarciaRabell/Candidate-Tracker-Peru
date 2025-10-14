@@ -3,8 +3,8 @@ export interface Candidate{
     name:String,
     party: String,
     Age:Number
-    birthplace:string,
     education:string,
     ideology: string,
+    summary:string
     image:string
 }

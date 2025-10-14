@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from 'next/link'
 
 export default function Home() {
   return (
@@ -8,8 +9,12 @@ export default function Home() {
         <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight">Por un Peru informado en miras a las elecciones 2026</h1>
         <p className="text-lg md:text-xl text-gray-600 max-w-xl">Aprende sobre los candidatos, sus propuestas y mas</p>
         <div className="flex flex-row gap-12">
-          <button className=" text-black font-semibold w-60 px-8 py-3 rounded-lg shadow hover:bg-gray-400 transition">Informate ahora</button>
-           <button className=" text-black font-semibold  px-8 py-3 rounded-lg shadow hover:bg-gray-400 transition">Conocenos</button>
+          <Link href={"/candidates"}>
+                    <button className="button">Informate ahora</button>
+          </Link>
+           <Link href={"/"}>
+               <button className="button">Conocenos</button>
+           </Link>
         </div>
       </div>
 
