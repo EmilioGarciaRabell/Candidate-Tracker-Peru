@@ -1,56 +1,132 @@
 import time
 from dotenv import load_dotenv
+import psycopg2
 load_dotenv()
 import os
 import requests
 import json
+from psycopg2 import sql
+from datetime import datetime
+
 
 
 NEWS_API = os.environ.get("CARLA_API")
-api_url = f"https://newsdata.io/api/1/latest?country=pe&apikey={NEWS_API}"
-
-
-def get_news_srcs():
-    response = requests.get(api_url)
-    results = []
-    print(response)
-    if response.status_code == 200:
-        data = response.json()
-        results.extend(data.get("results", []))
-        nextPage = data.get("nextPage")
-        print(nextPage)
-    else:
-        print("not found")
+api_url = f"https://newsdata.io/api/1/latest?country=PE&apikey={NEWS_API}"
 
 
 def get_all_news():
-    response = requests.get(api_url)
-    results = []
-    if response.status_code == 200:
-        page_count = 1
-        data = response.json()
-        results.append(data["results"])
-        nextPage = data["nextPage"]
+    try:
+        response = requests.get(api_url)
+        results = []
+        if response.status_code == 200:
+            page_count = 1
+            data = response.json()
+            results.extend(data["results"])
+            nextPage = data["nextPage"]
 
-        while nextPage is not None:
-            page_count +=1
-            
-            if page_count >= 20:
-                break
+            while nextPage is not None:
+                page_count +=1  
+                if page_count >= 50:
+                    break
+                new_url = api_url + f"&page={nextPage}"
+                response = requests.get(new_url)
 
-            new_url = api_url + f"&page={nextPage}"
+                if response.status_code == 200:
+                    data = response.json()
+                    results.extend(data.get("results", []))
+                    nextPage = data.get("nextPage")
+                else:
+                    print("error while loading")
+                    break
+                time.sleep(1)
+        return results
+    except Exception as e:
+        print("Error:", e) 
 
-            response = requests.get(new_url)
-            if response.status_code == 200:
-                data = response.json()
-                results.extend(data.get("results", []))
-                nextPage = data.get("nextPage")
-            else:
-                print("error while loading")
-                break
-            time.sleep(1)
+def get_all(item):
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        print("DATABASE_URL not found in environment")
+        return None
 
-    print(len(results))
+    try:
+        conn = psycopg2.connect(database_url)
+        cur = conn.cursor()
+        
+        select_query = ""
+        if item == "candidate":
+            select_query = sql.SQL("""
+                SELECT name from candidate_data.candidate_info
+            """)
 
-get_all_news()
+        elif item == "parties":
+            select_query = sql.SQL("""
+                SELECT name from candidate_data.parties
+            """)
+        else:
+            return None
+        cur.execute(
+            select_query
+        )
+        list_of_tuples = cur.fetchall()
+        
+        conn.commit()
+        cur.close()
+        conn.close()
 
+        return list_of_tuples
+
+    except Exception as e:
+        print("Error getting select statements:", e)
+        if conn:
+            conn.rollback()
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+        return None
+
+def database_connection():
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        print("DATABASE_URL not found in environment")
+        return None
+    conn = psycopg2.connect(database_url)
+
+    return conn
+
+
+
+def store_news():
+
+    news = get_all_news()
+    ##start database connection
+    conn = database_connection()
+    cur = conn.cursor()
+    
+    fetch_data = datetime.now()
+    ##for each news form the structure of the table
+    ##get article_id, title, link, keywords, fetch_data
+    try:
+        for n in news:
+            sql_query = sql.SQL("""
+                INSERT INTO candidate_data.all_news(id,title,link,keywords,fetch_data)
+                VALUES(%s, %s, %s,%s, %s)
+                RETURNING id;                   
+                """)
+            cur.execute(sql_query,(n["article_id"], n["title"], n["link"],n["keywords"],fetch_data))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+    except Exception as e:
+        print("Error getting select statements:", e)
+        if conn:
+            conn.rollback()
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+        return None
+
+store_news()
