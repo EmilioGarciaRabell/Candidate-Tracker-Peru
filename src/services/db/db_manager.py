@@ -101,10 +101,15 @@ class Database:
     
     def get_candidates_with_parties(self):
         conn = self._get_conn()
-        query = "SELECT "
+        query = """
+        select c.id as id ,c.name as name,c.age as age,p.name as party,c.education as education, c.summary as summary, c.ref as ref
+        from candidate_data.candidate_info c
+        LEFT JOIN candidate_data.parties p ON p.id=c.party_id
+        """
+        
         try:
             with conn.cursor() as cur:
-                cur.execute(sql_q, params)
+                cur.execute(query)
                 colnames = [c[0] for c in cur.description]
                 return [dict(zip(colnames, r)) for r in cur.fetchall()]
         finally:

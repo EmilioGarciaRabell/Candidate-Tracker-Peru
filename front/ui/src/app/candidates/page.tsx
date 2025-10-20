@@ -34,7 +34,7 @@ export default function Candidates() {
 
   },[])
 
-
+  if (loading) return <p>Loading...</p>;
 
 
   return (
@@ -47,3 +47,4 @@ export default function Candidates() {
     </div>
   );
 }
+

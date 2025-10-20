@@ -3,7 +3,8 @@ export interface Candidate {
     education: string;
     id: number;
     name: string;
-    party_id: number;
+    party: string;
+    party_id:number
     ref: string;
     summary: string;
 }
