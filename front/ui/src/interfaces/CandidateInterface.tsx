@@ -1,10 +1,9 @@
-export interface Candidate{
-    id:number
-    name:String,
-    party: String,
-    Age:Number
-    education:string,
-    ideology: string,
-    summary:string
-    image:string
+export interface Candidate {
+    age: number;
+    education: string;
+    id: number;
+    name: string;
+    party_id: number;
+    ref: string;
+    summary: string;
 }

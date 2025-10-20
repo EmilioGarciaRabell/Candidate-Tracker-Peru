@@ -1,18 +1,45 @@
+'use client'; 
 import UserCard from "@/components/UserCard";
 import { Candidate } from "@/interfaces/CandidateInterface";
-
+import { useEffect, useState } from "react";
+import s from "./candidates.module.css"
 export default function Candidates() {
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      try{
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL
+        const res = await fetch(`${apiUrl}/candidates`
+          
+        )
+        console.log(res)
+        if (!res.ok) throw new Error(`Error ${res.status}`);
+        const data = await res.json();
+        
 
-  let candidate_array: Candidate[] = [
-    {id:1,name:"Porky",party:"PPK",Age:81,education:"alas peruanas",ideology:"right-wing",image:"/landing_page.jpg",summary:"hola"},
-    {id:2,name:"Porky",party:"PPK",Age:81,education:"alas peruanas",ideology:"right-wing",image:"/landing_page.jpg",summary:"holaaa"},
-    {id:3,name:"Porky",party:"PPK",Age:81,education:"alas peruanas",ideology:"right-wing",image:"/landing_page.jpg",summary:"holaaa"},
-  ]
+        setCandidates(data.candidates)
 
- 
+        } catch (err: any) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
+        }
+      
+    }
+
+    fetchCandidates()
+
+  },[])
+
+
+
+
   return (
-    <div className="flex flex-row items-center justify-center gap-5 mt-45">
-        {candidate_array.map((c: Candidate) => (
+    <div className={s.candidates_list}>
+        {candidates.map((c: Candidate) => (
           <li key={c.id}>
             <UserCard {...c}></UserCard>
           </li>

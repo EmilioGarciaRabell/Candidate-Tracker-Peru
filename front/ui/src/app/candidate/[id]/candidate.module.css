@@ -1,0 +1,527 @@
+/* Main Layout */
+.profile_container {
+  display: flex;
+  width: 95%;
+  max-width: 1800px;
+  margin: 40px auto;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+  padding: 20px;
+}
+
+/* Sidebar */
+.profile_sidebar {
+  width: 35%;
+  background: #f9f9f9;
+  padding: 30px;
+  border-right: 1px solid #ddd;
+}
+
+.profile_pic {
+  display: flex;
+  justify-content: center;
+}
+
+/* Work Section */
+.work_section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  margin: 30px 0;
+}
+
+.work_section h3 {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.work_section h3::after {
+  content: "";
+  flex-grow: 1;
+  height: 1px;
+  background-color: #000;
+  margin-left: 15px;
+}
+
+.experience_list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.experience_list li {
+  margin-bottom: 15px;
+}
+
+.experience_list strong {
+  display: block;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #222;
+}
+
+.experience_list p {
+  margin: 4px 0 0 0;
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+/* Badges */
+.badge {
+  background: #007bff;
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+}
+
+.badge.secondary {
+  background: #6c63ff;
+}
+
+/* Details Section */
+.profile_details {
+  flex: 1;
+  padding: 40px;
+}
+
+.profile_details h2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.job_title {
+  color: #007bff;
+  margin: 8px 0 16px;
+}
+
+/* Background Section */
+.background_section {
+  width: 100%;
+  margin: 30px 0;
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.background_section h3 {
+  display: flex;
+  align-items: center;
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.background_section p {
+  color: #444;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Antecedentes Section */
+.antecedentes_section {
+  width: 100%;
+  margin: 40px 0;
+}
+
+.antecedentes_section h3 {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.antecedentes_section h3::after {
+  content: "";
+  flex-grow: 1;
+  height: 2px;
+  background-color: #000;
+  margin-left: 15px;
+}
+
+.antecedente_list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-height: 45vh;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+/* Scrollbar */
+.antecedente_list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.antecedente_list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 8px;
+}
+
+.antecedente_list::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 8px;
+}
+
+.antecedente_list::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.antecedente_item {
+  background: #fff;
+  border-left: 5px solid #0077cc;
+  border-radius: 8px;
+  padding: 15px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.antecedente_item h4 {
+  margin: 0 0 6px 0;
+  color: #222;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.antecedente_item p {
+  margin: 0 0 8px 0;
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.antecedente_item a {
+  font-size: 0.9rem;
+  color: #0077cc;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.antecedente_item a:hover {
+  text-decoration: underline;
+}
+
+.antecedente_item.good {
+  border-left-color: #28a745;
+}
+
+.antecedente_item.bad {
+  border-left-color: #dc3545;
+}
+
+
+
+.public_opinion_section {
+  width: 100%;
+  margin: 40px 0;
+}
+
+.public_opinion_section h3 {
+  display: flex;
+  align-items: center;
+  font-size: 1.6rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.public_opinion_section h3::after {
+  content: "";
+  flex-grow: 1;
+  height: 2px;
+  background-color: #000;
+  margin-left: 15px;
+}
+
+/* Sentiment overview */
+.sentiment_overview {
+  margin-bottom: 30px;
+}
+
+.sentiment_bar {
+  display: flex;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.segment {
+  text-align: center;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 10px 0;
+}
+
+.positive { background-color: #28a745; }
+.neutral { background-color: #ffc107; color: #333; }
+.negative { background-color: #dc3545; }
+
+.sentiment_note {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Polls section */
+.polls_section h4 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.poll_list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 30px 0;
+}
+
+.poll_list li {
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.poll_list a {
+  color: #0077cc;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.poll_list a:hover {
+  text-decoration: underline;
+}
+
+/* Mentions */
+.social_mentions h4 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.mention_item {
+  background: #f9f9f9;
+  border-left: 5px solid #0077cc;
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.mention_item p {
+  margin: 0 0 5px 0;
+  color: #333;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.mention_item span {
+  font-size: 0.85rem;
+  color: #777;
+}
+
+
+
+
+
+
+
+/* Social Section */
+.social_section {
+  width: 100%;
+  margin: 40px 0;
+}
+
+.social_section h3 {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.social_section h3::after {
+  content: "";
+  flex-grow: 1;
+  height: 2px;
+  background-color: #000;
+  margin-left: 15px;
+}
+
+.social_links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.social_links a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #333;
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 10px 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease-in-out;
+}
+
+.social_links a:hover {
+  background: #0077cc;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.social_links img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Buttons */
+.buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: 1px solid #ccc;
+  padding: 8px 14px;
+  border-radius: 4px;
+  background: #f5f5f5;
+  cursor: pointer;
+}
+
+.btn.primary {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+/* Nav */
+.nav_bar {
+  display: flex;
+  margin: 20px 0;
+  border-bottom: 2px solid #eee;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.nav_item {
+  background: none;
+  border: none;
+  padding: 10px 15px;
+  font-weight: 500;
+  font-size: 15px;
+  color: #555;
+  cursor: pointer;
+  transition: color 0.2s, border-bottom 0.2s;
+  border-bottom: 2px solid transparent;
+}
+
+.nav_item:hover {
+  color: #111;
+}
+
+.active {
+  color: #000;
+  border-bottom: 2px solid #0070f3;
+}
+
+.tab_content {
+  margin-top: 20px;
+}
+
+/* 📱 MOBILE RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+  .profile_container {
+    flex-direction: column;
+    width: 100%;
+    margin: 10px auto;
+    padding: 15px;
+  }
+
+  .profile_sidebar {
+    width: 100%;
+    padding: 20px;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .profile_details {
+    padding: 20px;
+  }
+
+  .background_section,
+  .antecedentes_section,
+  .social_section {
+    padding: 15px;
+    margin: 20px 0;
+  }
+
+  .work_section h3,
+  .antecedentes_section h3,
+  .social_section h3,
+  .background_section h3 {
+    font-size: 1.25rem;
+  }
+
+  .experience_list strong {
+    font-size: 1rem;
+  }
+
+  .antecedente_item {
+    padding: 12px 15px;
+  }
+
+  .antecedente_item p {
+    font-size: 0.9rem;
+  }
+
+  .social_links {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .social_links a {
+    justify-content: center;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .nav_bar {
+    gap: 10px;
+    justify-content: center;
+  }
+
+    .segment {
+    font-size: 0.75rem;
+    padding: 8px 0;
+  }
+  .poll_list li {
+    font-size: 0.9rem;
+  }
+  .mention_item {
+    padding: 12px 15px;
+  }
+}
