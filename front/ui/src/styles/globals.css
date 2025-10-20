@@ -46,14 +46,13 @@ body {
 }
 
 .header{
-  background-color: #FCF8F1;
-  opacity: 30%;
-
+  background-color: white;
 }
 
 .div1{
   padding-inline: calc(var(--spacing) * 4);
   margin-inline: inline ;
+  margin-top: 10px;
 }
 
 @media (min-width: 640px) {
@@ -71,13 +70,40 @@ body {
 .navflex{
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   height: calc(var(--spacing) * 16);
+}
+
+.logo{
+  flex-shrink: 0;
 }
 
 
 @media (min-width: 1024px) {
   .div1 {
     height: calc(var(--spacing) * 16);
+  }
+}
+
+.links{
+  display: none;
+}
+
+
+  @media (min-width: 1024px) {
+  .links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem; /* adds spacing between links */
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@layer components {
+  .nav-link {
+    @apply text-black px-5 py-2.5 font-medium hover:text-black hover:bg-gray-100  rounded-full text-2xl
   }
 }
