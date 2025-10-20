@@ -34,33 +34,11 @@ hr {
 /* Reset */
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
   font-family: "Inter", sans-serif;
-  color: #000;
 }
 
 
-.button {
-    @apply
-    inline-flex 
-    items-center 
-    px-6 
-    py-4 
-    mt-8
-    bg-stone-800 
-    text-white 
-    font-medium 
-    rounded-full 
-    transition 
-    duration-300 
-    hover:bg-gray-800
-    hover:shadow-[0_0_12px_rgba(0,0,0,0.3)]
-    active:scale-[0.97]
-    focus:outline-none 
-    focus:ring-2 
-    focus:ring-gray-400/40
-}
+
 
 .header{
   background-color: white;
@@ -89,6 +67,7 @@ hr {
   align-items: center;
   justify-content: space-between;
   height: calc(var(--spacing) * 16);
+  margin-top: 20px;
 }
 
 .logo{
@@ -123,4 +102,9 @@ hr {
   .nav-link {
     @apply text-black px-5 py-2.5 font-medium hover:text-black hover:bg-gray-100  rounded-full text-2xl
   }
+}
+
+.customButton{
+  @apply
+    px-5 py-2.5 text-base transition-all duration-200 hover:bg-red-400 hover:text-black focus:text-black focus:bg-yellow-400 font-semibold text-white bg-black rounded-full
 }

@@ -27,7 +27,7 @@ export default function Navbar(){
                             <Link href="/dashboard" className="nav-link">Tendencias</Link>
                     </div>
 
-                  <a href="#" title="" className="hidden lg:inline-flex items-center justify-center px-5 py-2.5 text-base transition-all duration-200 hover:bg-red-400 hover:text-black focus:text-black focus:bg-yellow-400 font-semibold text-white bg-black rounded-full" role="button"> Explora ahora </a>
+                  <a href="#" title="" className="customButton hidden lg:inline-flex items-center justify-center " role="button"> Explora ahora </a>
 
                 </div>
         </div>

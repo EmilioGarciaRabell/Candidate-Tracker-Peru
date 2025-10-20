@@ -2,6 +2,8 @@
 import { Candidate } from "@/interfaces/CandidateInterface";
 import s from "./userCard.module.css";
 import { useRouter } from "next/navigation";
+import "../styles/globals.css";
+
 
 export default function UserCard({ name, party, age, id }: Candidate) {
   const router = useRouter();
@@ -24,7 +26,7 @@ export default function UserCard({ name, party, age, id }: Candidate) {
 
       {/* Button */}
       <button
-        className={s.cardButton}
+        className="customButton"
         onClick={() => router.push(`/candidate/${id}`)}
       >
         Más Info

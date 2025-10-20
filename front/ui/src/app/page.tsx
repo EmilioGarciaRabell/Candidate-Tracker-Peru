@@ -16,7 +16,7 @@ export default function Home() {
             <p className="mt-4 text-4xl font-bold text-black lg:mt-8 sm:text-6xl xl:text-8xl">Informate por un Peru mejor</p>
 
               <Link href="/candidates">
-                <button className="mt-10 px-5 py-2.5 text-base transition-all duration-200 hover:bg-red-400 hover:text-black focus:text-black focus:bg-yellow-400 font-semibold text-white bg-black rounded-full">
+                <button className="customButton mt-10">
                   Infórmate ahora
                 </button>
               </Link>
