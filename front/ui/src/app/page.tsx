@@ -1,36 +1,42 @@
 import Image from "next/image";
-import Link from 'next/link'
+import Link from "next/link";
+import styles from "./home.module.css"; 
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <main className="-mt-60 max-w-6xl mx-auto px-6 py-20 flex flex-col md:flex-row items-start gap-12 ">
-      <div className="flex-1 flex flex-col items-start text-left space-y-6 h-80 gap-5">
-        <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight">Por un Peru informado en miras a las elecciones 2026</h1>
-        <p className="text-lg md:text-xl text-gray-600 max-w-xl">Aprende sobre los candidatos, sus propuestas y mas</p>
-        <div className="flex flex-row gap-12">
-          <Link href={"/candidates"}>
-                    <button className="button">Informate ahora</button>
-          </Link>
-           <Link href={"/"}>
-               <button className="button">Conocenos</button>
-           </Link>
-        </div>
-      </div>
+    <section className={styles.background}>
+      <div className={styles.padding}>
 
-      <div className="flex-1 flex justify-center">
-        <Image 
-        src={"/landing_page.jpg"} 
-        alt={"imagen del landing page"}
-        width={2000}
-        height={2000}
-        className="rounded-xl shadow-lg"
-        ></Image>
+        <div className={styles.home}>
+
+          <div>
+
+            <h1 className="text-base font-semibold tracking-wider text-blue-600 uppercase"> Por un Peru informado en miras a las elecciones 2026</h1>
+
+            <p className="mt-4 text-4xl font-bold text-black lg:mt-8 sm:text-6xl xl:text-8xl">Informate por un Peru mejor</p>
+
+              <Link href="/candidates">
+                <button className="mt-10 px-5 py-2.5 text-base transition-all duration-200 hover:bg-red-400 hover:text-black focus:text-black focus:bg-yellow-400 font-semibold text-white bg-black rounded-full">
+                  Infórmate ahora
+                </button>
+              </Link>
+
+          </div>
+
+          <div className={styles.imageSection}>
+            <Image
+              src="/landing.svg"
+              alt="imagen del landing page"
+              width={100}
+              height={100}
+              className="w-full rounded-4xl"
+            />
+          </div>
+
         </div>
-        </main>
-        <footer className="">
-        
-        </footer>
+          
+
       </div>
+    </section>
   );
 }
