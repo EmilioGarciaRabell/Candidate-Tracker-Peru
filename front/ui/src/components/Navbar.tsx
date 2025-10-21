@@ -23,6 +23,7 @@ export default function Navbar(){
 
                     <div className="links">
                             <Link href="/candidates" className="nav-link">Candidatos</Link>
+                            <Link href="/parties" className="nav-link">Partidos</Link>
                             <Link href="/candidates" className="nav-link">Noticias</Link>
                             <Link href="/dashboard" className="nav-link">Tendencias</Link>
                     </div>
