@@ -14,8 +14,9 @@
 
 @media (min-width: 1024px) {
   .background {
-    padding-top: 6rem;
-    padding-bottom: 6rem;
+    margin-top: 0;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
   }
 }
 
@@ -23,6 +24,7 @@
     padding-inline: calc(var(--spacing) * 4);
     margin-inline: auto;
     max-width: var(--container-7xl);
+    margin-bottom: 200px;
 }
 
 @media (min-width: 640px) {

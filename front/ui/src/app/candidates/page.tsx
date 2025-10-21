@@ -3,6 +3,7 @@ import UserCard from "@/components/UserCard";
 import { Candidate } from "@/interfaces/CandidateInterface";
 import { useEffect, useState } from "react";
 import s from "./candidates.module.css"
+import SearchBar from "@/components/SearchBar";
 export default function Candidates() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +39,13 @@ export default function Candidates() {
 
 
   return (
+    <>
+  <div>
+    
+    <div className={s.scontainer}>
+      <SearchBar></SearchBar>
+    </div>
+
     <div className={s.candidates_list}>
         {candidates.map((c: Candidate) => (
           <li key={c.id}>
@@ -45,6 +53,10 @@ export default function Candidates() {
           </li>
         ))}
     </div>
+
+  </div>
+    </>
+    
   );
 }
 
