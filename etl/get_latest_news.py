@@ -26,11 +26,10 @@ def get_all_news():
 
             while nextPage is not None:
                 page_count +=1  
-                if page_count >= 50:
+                if page_count >= 80:
                     break
                 new_url = api_url + f"&page={nextPage}"
                 response = requests.get(new_url)
-
                 if response.status_code == 200:
                     data = response.json()
                     results.extend(data.get("results", []))
@@ -98,15 +97,15 @@ def database_connection():
 
 
 def store_news():
-
     news = get_all_news()
     ##start database connection
     conn = database_connection()
     cur = conn.cursor()
     
-    fetch_data = datetime.now()
+    current_time = datetime.now()
     ##for each news form the structure of the table
     ##get article_id, title, link, keywords, fetch_data
+    
     try:
         for n in news:
             sql_query = sql.SQL("""
@@ -114,7 +113,7 @@ def store_news():
                 VALUES(%s, %s, %s,%s, %s)
                 RETURNING id;                   
                 """)
-            cur.execute(sql_query,(n["article_id"], n["title"], n["link"],n["keywords"],fetch_data))
+            cur.execute(sql_query,(n["article_id"], n["title"], n["link"],n["keywords"],current_time))
         conn.commit()
         cur.close()
         conn.close()
@@ -129,4 +128,43 @@ def store_news():
             conn.close()
         return None
 
-store_news()
+
+def retrieve_results(slot):
+
+    query = """
+        select  * from candidate_data.all_news
+        where fetch_data::time BETWEEN (%s) and (%s)
+        and fetch_data::date = CURRENT_DATE
+    """
+    interval1 = ''
+    interval2 = ''
+    if slot == 'morning':
+        interval1 = '7:00'
+        interval2 = '8:00'
+    elif slot == 'evening':
+        interval1 = '13:00'
+        interval2 = '14:00'
+    
+    conn = database_connection()
+    cur = conn.cursor()
+
+    try:
+        news = cur.fetchall(query,(interval1,interval2))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return news
+    except Exception as e:
+        print("Error getting select statements:", e)
+        if conn:
+            conn.rollback()
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+        return None  
+
+
+
+    
