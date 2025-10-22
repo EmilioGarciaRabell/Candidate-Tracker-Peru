@@ -129,8 +129,7 @@ def store_news():
         return None
 
 
-def retrieve_results(slot):
-
+def get_news_from_db(slot):
     query = """
         select  * from candidate_data.all_news
         where fetch_data::time BETWEEN (%s) and (%s)
@@ -166,5 +165,65 @@ def retrieve_results(slot):
         return None  
 
 
-
+def retrieve_results(batch_time):
+    conn = database_connection()
+    cur = conn.cursor()
+    query = """
+        select  * from candidate_data.all_news
+        where fetch_data::time BETWEEN (%s) and (%s)
+        and fetch_data::date = CURRENT_DATE -1
+    """
+    interval1 = ''
+    interval2 = ''
+    if batch_time == 'morning':
+        interval1 = '7:00'
+        interval2 = '8:00'
+    elif batch_time == 'evening':
+        interval1 = '19:00'
+        interval2 = '20:00' 
+    else:
+         interval1 = 'batch_not_found'
+         interval2 = 'batch_not_found'
     
+    print(interval1)
+    print(interval2)
+
+    try:
+        with conn.cursor() as cur:
+                cur.execute(query,(interval1,interval2,))
+                colnames = [c[0] for c in cur.description]
+                return [dict(zip(colnames, r)) for r in cur.fetchall()]
+    finally:
+            cur.close()
+            conn.close()
+    
+
+def get_candidate_news(batch_time):
+    conn = database_connection()
+    cur = conn.cursor()
+    news = retrieve_results(batch_time)
+    print(news)
+    candidates = get_all("candidate")
+    print(candidates)
+    result = dict()
+    for candidate in candidates:
+        for n in news:
+            if candidate in n["keywords"] and n is not None:
+                result["title"] = news["title"]
+                result["link"] = news["link"]
+    
+    print(result)
+    query = """
+    TRUNCATE TABLE candidate_data.all_news
+    """
+    try:
+        if batch_time == "afternoon":
+            with conn.cursor() as cur:
+                cur.execute(query)
+                conn.commit()
+    finally:
+            cur.close()
+            conn.close()
+
+
+print(get_candidate_news("evening")[1]["keywords"])
