@@ -55,12 +55,12 @@ def get_all(item):
         select_query = ""
         if item == "candidate":
             select_query = sql.SQL("""
-                SELECT name from candidate_data.candidate_info
+                SELECT id,name from candidate_data.candidate_info
             """)
 
         elif item == "parties":
             select_query = sql.SQL("""
-                SELECT name from candidate_data.parties
+                SELECT id,name from candidate_data.parties
             """)
         else:
             return None
@@ -72,7 +72,6 @@ def get_all(item):
         conn.commit()
         cur.close()
         conn.close()
-
         return list_of_tuples
 
     except Exception as e:
@@ -133,7 +132,7 @@ def get_news_from_db(slot):
     query = """
         select  * from candidate_data.all_news
         where fetch_data::time BETWEEN (%s) and (%s)
-        and fetch_data::date = CURRENT_DATE
+        and fetch_data::date = CURRENT_DATE -1
     """
     interval1 = ''
     interval2 = ''
@@ -171,7 +170,7 @@ def retrieve_results(batch_time):
     query = """
         select  * from candidate_data.all_news
         where fetch_data::time BETWEEN (%s) and (%s)
-        and fetch_data::date = CURRENT_DATE -1
+        and fetch_data::date = CURRENT_DATE - 2
     """
     interval1 = ''
     interval2 = ''
@@ -202,17 +201,20 @@ def get_candidate_news(batch_time):
     conn = database_connection()
     cur = conn.cursor()
     news = retrieve_results(batch_time)
-    print(news)
-    candidates = get_all("candidate")
-    print(candidates)
-    result = dict()
+    candidates = get_all("candidate")   
+    candidates = [(1, 'espectáculos'), (2,'actualidad')]
+    result = []
     for candidate in candidates:
+        candidate_news = {      
+            "id": candidate[0],
+            "news": []
+        }
         for n in news:
-            if candidate in n["keywords"] and n is not None:
-                result["title"] = news["title"]
-                result["link"] = news["link"]
-    
-    print(result)
+            if n is not None and n["keywords"] is not None:
+                if candidate[1] in n["keywords"]:
+                    candidate_news["news"].append({"title": n["title"],"link": n["link"],"keywords":n["keywords"]})
+        result.append(candidate_news)
+
     query = """
     TRUNCATE TABLE candidate_data.all_news
     """
@@ -226,4 +228,4 @@ def get_candidate_news(batch_time):
             conn.close()
 
 
-print(get_candidate_news("evening")[1]["keywords"])
+get_candidate_news("evening")
