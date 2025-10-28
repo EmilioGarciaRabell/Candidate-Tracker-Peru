@@ -7,6 +7,7 @@ import requests
 import json
 from psycopg2 import sql
 from datetime import datetime
+from unidecode import unidecode
 
 
 
@@ -170,7 +171,7 @@ def retrieve_results(batch_time):
     query = """
         select  * from candidate_data.all_news
         where fetch_data::time BETWEEN (%s) and (%s)
-        and fetch_data::date = CURRENT_DATE - 2
+        and fetch_data::date = CURRENT_DATE - 4
     """
     interval1 = ''
     interval2 = ''
@@ -196,13 +197,19 @@ def retrieve_results(batch_time):
             cur.close()
             conn.close()
     
+def remove_accents(list):
+    result = []
+    for i in list:
+        result.append(unidecode(i).lower())
+    return result   
+
+# print(remove_accents(['espectáculos']))
 
 def get_candidate_news(batch_time):
     conn = database_connection()
     cur = conn.cursor()
     news = retrieve_results(batch_time)
     candidates = get_all("candidate")   
-    candidates = [(1, 'espectáculos'), (2,'actualidad')]
     result = []
     for candidate in candidates:
         candidate_news = {      
@@ -211,7 +218,8 @@ def get_candidate_news(batch_time):
         }
         for n in news:
             if n is not None and n["keywords"] is not None:
-                if candidate[1] in n["keywords"]:
+                clean_keywords = remove_accents(n["keywords"])
+                if unidecode(candidate[1].lower()) in clean_keywords or unidecode(candidate[1].lower()) in unidecode(n["title"].lower()):
                     candidate_news["news"].append({"title": n["title"],"link": n["link"],"keywords":n["keywords"]})
         result.append(candidate_news)
 
