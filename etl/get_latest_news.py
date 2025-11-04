@@ -27,7 +27,7 @@ def get_all_news():
 
             while nextPage is not None:
                 page_count +=1  
-                if page_count >= 80:
+                if page_count >= 75:
                     break
                 new_url = api_url + f"&page={nextPage}"
                 response = requests.get(new_url)
@@ -96,7 +96,7 @@ def database_connection():
 
 
 
-def store_news():
+def call_api_store_initial_news():
     news = get_all_news()
     ##start database connection
     conn = database_connection()
