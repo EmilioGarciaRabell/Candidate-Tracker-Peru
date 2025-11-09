@@ -20,7 +20,7 @@ def predict_sentiment(text):
     return labels[probs.argmax()], probs.tolist()
 
 
-def process_content_sentimnent(content:list[dict]):
+def process_content_sentiment(content: list[dict]):
    
     posts_info = []
 
@@ -31,8 +31,8 @@ def process_content_sentimnent(content:list[dict]):
         comments_sentiment = {"negative":0, "neutral":0, "positive":0}
 
         post_content = item.get("text")
-        if not post_content:
-            break
+        if not post_content or type(post_content) != str:
+            continue
         
         label, _ = predict_sentiment(post_content)
         overall_sentiment[label] += 1
@@ -41,7 +41,7 @@ def process_content_sentimnent(content:list[dict]):
         comments = item.get("comments", [])
         
         for comment in comments:
-            if not comment:
+            if not comment or type(comment) != str:
                 continue
 
             c_label, _ = predict_sentiment(comment)
@@ -62,16 +62,6 @@ def process_content_sentimnent(content:list[dict]):
     
     return overall_sentiment, posts_info
 
-import os
-import psycopg2
-from psycopg2.extras import Json
-
-import os
-import psycopg2
-
-import os
-import psycopg2
-
 
 def get_candidate_sentiment(candidate:str, id: int):
     # get content
@@ -82,12 +72,12 @@ def get_candidate_sentiment(candidate:str, id: int):
     overall_content = reddit_content + twitter_content
     
     # Apply sentiment analysis 
-    overall_sentiment, posts_info = process_content_sentimnent(overall_content)
-    sentiment_result = llm.get_twitter_summary(candidate, overall_sentiment, posts_info)
+    overall_sentiment, posts_info = process_content_sentiment(overall_content)
+    sentiment_result = llm.get_sentiment_summary(candidate, overall_sentiment, posts_info)
     
     
 
-    insert_sentiment(id, sentiment_result)
+    insert_sentiment(sentiment_result, id)
 
 def get_candidates_id():
     # get canditate name and ID
@@ -141,60 +131,51 @@ def insert_sentiment(content, candidate_id):
     positive = content.get("positive")
     neutral = content.get("neutral")
 
-    text_result = content.get("content", {})
-    title = text_result.get("title", "") if isinstance(text_result, dict) else ""
-    summary = text_result.get("summary", "") if isinstance(text_result, dict) else ""
-    body = text_result.get("content", "") if isinstance(text_result, dict) else ""
+    
+    title = content.get("title", "")
+    summary = content.get("summary", "")
+    body = content.get("content", "") 
+    
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        print("DATABASE_URL not found in environment")
+        return None
 
     try:
-        conn = psycopg2.connect(
-            dbname=os.getenv("DB_NAME"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            host=os.getenv("DB_HOST"),
-            port=os.getenv("DB_PORT")
-        )
+        conn = psycopg2.connect(database_url)
         cur = conn.cursor()
 
         sql = """
-            UPDATE candidate_data.sentiment_analysis
-            SET
-                negative = %s,
-                positive = %s,
-                neutral  = %s,
-                title = %s,
-                summary = %s,
-                content = %s
-            WHERE id = %s
-            RETURNING id;
+            INSERT INTO candidate_data.sentiment_analysis(candidate_id,negative, positive, neutral, title, summary, content)
+            VALUES (%s,%s,%s,%s,%s,%s,%s);
+                
         """
 
         cur.execute(sql, (
+            candidate_id,
             negative,
             positive,
             neutral,
             title,
             summary,
-            body,
-            candidate_id
+            body
+            
         ))
 
-        row = cur.fetchone()
         conn.commit()
         cur.close()
         conn.close()
 
-        if row:
-            return {"status": "success", "updated_id": row[0]}
-        else:
-            return {"status": "error", "message": "No row updated (id not found)."}
+       
 
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
 if __name__ == "__main__":
     candidates = get_candidates_id()
-    for candidate, id in candidates:
+    for id, candidate in candidates:
+        if candidate == "Pendiente":
+            continue
         candidate_sentiment = get_candidate_sentiment(candidate, id)
         insert_sentiment(candidate_sentiment, id)
 
