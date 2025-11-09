@@ -1,26 +1,13 @@
 import requests
 from datetime import datetime, timedelta, timezone
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-import torch
 import os
-from google import genai
 from dotenv import load_dotenv
+import sentiment as sentiment_analysis
+import llm
 
 load_dotenv()
 TWITTER_API_KEY = os.environ.get("TWITTER_API")
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
-MODEL = "cardiffnlp/twitter-xlm-roberta-base-sentiment"
-tok = AutoTokenizer.from_pretrained(MODEL)
-mdl = AutoModelForSequenceClassification.from_pretrained(MODEL)
-mdl.eval()
-
-@torch.inference_mode()
-def predict_sentiment(text):
-    inputs = tok(text, return_tensors="pt", truncation=True)
-    probs = torch.softmax(mdl(**inputs).logits, dim=-1).flatten()
-    labels = ["negative", "neutral", "positive"]
-    return labels[probs.argmax()], probs.tolist()
 
 
 def get_candidate_twits_and_sentiment_analysis(candidate):
@@ -67,7 +54,7 @@ def get_candidate_twits_and_sentiment_analysis(candidate):
             # sentiment analysis
             if len(text) > 1200:
                 continue
-            sentiment = predict_sentiment(text)[0]
+            sentiment = sentiment_analysis.predict_sentiment(text)[0]
             overall_sentiment[sentiment] += 1
             overall_sentiment["total"] += 1
 
@@ -95,48 +82,129 @@ def get_candidate_twits_and_sentiment_analysis(candidate):
     return all_tweets, overall_sentiment
 
 
-def get_twitter_summary(candidate, tweets, sentiment):
-    client = genai.Client(api_key=GEMINI_API_KEY)
 
-    prompt = f"""
-                You are an expert political sentiment analyst.
+def get_tweets_and_comments(candidate):
+    endpoint = "https://api.twitterapi.io/twitter/tweet/advanced_search"
 
-                Task:
-                Analyze public sentiment about the Peruvian presidential candidate **{candidate}** using ONLY the information from:
-                1️⃣ The tweets provided
-                2️⃣ The aggregated sentiment analysis statistics
+    query = f'"{candidate}" lang:es -is:retweet'
+    params = {
+        "query": query,
+        "queryType": "Top",
+        "cursor": ""
+    }
+    headers = {"X-API-Key": TWITTER_API_KEY}
 
-                Do NOT use external knowledge or make assumptions beyond the data.
+    all_tweets = []
+    page = 1
 
-                Please provide a structured analysis including:
-                - 🧠 **Overall sentiment** (how positive/negative/mixed?)
-                - 🔑 **Top themes** mentioned in the tweets (bullet points)
-                - 🎯 **Most common praise** (bullet points)
-                - ⚠️ **Most common criticisms** (bullet points)
-                - 📊 A clear **sentiment score interpretation** based on the provided sentiment structure
-                - 📝 3–5 short **representative example tweet summaries** (not direct quotes)
+    while True:
+        response = requests.get(endpoint, headers=headers, params=params)
 
-                Here is the tweet dataset:
-                {tweets}
+        if response.status_code != 200:
+            print("Error:", response.status_code, response.text)
+            break
 
-                Here is the sentiment analysis summary:
-                {sentiment}
+        data = response.json()
+        tweets = data.get("tweets", [])
 
-                Make the report concise, insightful, and data-driven. Please respond in spanish.
-                """
+        print(f"Page {page}: Retrieved {len(tweets)} tweets")
+        page += 1
 
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt
-    )
+        for t in tweets:
+            author = t.get("author", {})
+            created_at_str = t.get("createdAt", "N/A")
+            text = t.get("text", "")
 
-    print(response.text)
+
+            if created_at_str:
+                created_at = datetime.strptime(created_at_str, "%a %b %d %H:%M:%S %z %Y")
+
+                # Compare using UTC
+                now = datetime.now(timezone.utc)
+                print(f"date:  {created_at}")
+
+                if now - created_at > timedelta(days=15):
+                    return  # tweet is older than 15 days
+
+
+                conversation_id = t.get("conversationId")
+                comments = []
+                if conversation_id:
+                    comments =  get_tweet_replies(conversation_id, headers)
+                
+                
+                all_tweets.append({
+                    "author": author,
+                    "username": author.get("username") or author.get("name") or "unknown",
+                    "text": text,
+                    "likes": t.get("likeCount", 0),
+                    "retweets": t.get("retweetCount", 0),
+                    
+                    "created":created_at_str,
+                    "comments": comments
+                })
+
+        # Pagination: Stop if no next page
+        if not data.get("has_next_page"):
+            print("No more pages.")
+            break
+
+        # Update cursor for next request
+        params["cursor"] = data.get("next_cursor", "")
+        if not params["cursor"]:
+            print("Cursor missing, stopping.")
+            break
+    return all_tweets
+
+
+def get_tweet_replies(tweet_id, headers, max_replies=100):
+    endpoint = "https://api.twitterapi.io/twitter/tweet/replies"
+   
+
+    params = {
+        "tweetId": tweet_id,
+        "cursor": ""
+    }
+
+    all_replies = []
+
+    while True:
+        response = requests.get(endpoint, headers=headers, params=params)
+
+        if response.status_code != 200:
+            print("Error:", response.status_code, response.text)
+            break
+
+        data = response.json()
+        replies = data.get("tweets", [])
+
+        for r in replies:
+            all_replies.append({
+                "id": r.get("id"),
+                "text": r.get("text"),
+                "author": r.get("author", {}).get("userName"),
+                "createdAt": r.get("createdAt")
+            })
+
+        if not data.get("has_next_page"):
+            break
+
+        params["cursor"] = data.get("next_cursor", "")
+        if not params["cursor"]:
+            break
+
+        if len(all_replies) > max_replies:
+            break
+
+    return all_replies
+
 
 
 def main():
     candidate = "Rafael Lopez Aliaga"
-    all_tweets, sentiment = get_candidate_twits_and_sentiment_analysis(candidate)
-    get_twitter_summary(candidate, all_tweets, sentiment)
+    # all_tweets, sentiment = get_candidate_twits_and_sentiment_analysis(candidate)
+    # llm.get_twitter_summary(candidate, all_tweets, sentiment)
+    get_tweets_and_comments(candidate)
 
 if __name__ == "__main__":
     main()
