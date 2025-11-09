@@ -7,3 +7,5 @@ Flask-Cors
 python-dotenv
 gunicorn # For production purposes
 psycopg2
+transformers
+torch
