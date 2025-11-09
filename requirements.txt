@@ -8,3 +8,5 @@ python-dotenv
 gunicorn # For production purposes
 psycopg2
 apscheduler
+google-search-results
+Wikipedia-API

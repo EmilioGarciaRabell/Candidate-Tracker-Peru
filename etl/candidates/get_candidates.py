@@ -6,8 +6,18 @@ from bs4 import BeautifulSoup
 import psycopg2
 from psycopg2 import sql
 from dotenv import load_dotenv
+from serpapi import GoogleSearch
+import wikipediaapi
+from google import genai
+import os
+load_dotenv()
 
-BASE_URL = "https://es.wikipedia.org/wiki/Elecciones_generales_de_Per%C3%BA_de_2026"
+# --- Setup ---
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+client = genai.Client(api_key=GEMINI_API_KEY)
+
+
+BASE_URL = "https://elcomercio.pe/elecciones/elecciones-2026-jne-candidatos-presidenciales-estos-son-los-mas-de-60-aspirantes-que-se-proyectan-hacia-el-sillon-presidencial-en-las-proximas-elecciones-del-12-de-abril-elecciones-primarias-noticia/"
 
 load_dotenv()
 
@@ -39,138 +49,117 @@ def clean_summary(summary):
     return summary
 
 
+def get_wikipedia_page(name: str):
+    wiki = wikipediaapi.Wikipedia(
+        language='es',
+        user_agent='candidate-info-fetcher/1.0 (contact@example.com)'
+    )
+    page = wiki.page(name)
+    if not page.exists():
+        return None, None
+    
+    # Collect reference links if available
+    references = []
+    for link_title in page.references.keys() if hasattr(page, "references") else []:
+        link = page.references[link_title]
+        if link and link.startswith("http"):
+            references.append(link)
+
+    return page.text, page.fullurl
+
+
+
 def get_candidates():
     # request setup
     html = fetch_page(BASE_URL)
     soup = BeautifulSoup(html, "lxml")
-    table = soup.find("table", {"class": "wikitable"})
+    table = soup.find("table", {"aria-label": "Organizaciones políticas y candidatos"})
     if not table:
         raise Exception("No se encontró la tabla de candidatos.")
 
     candidates = []
     # get all the tr tags
     for row in table.find_all("tr")[1:]:
-        cols = row.find_all(["td", "th"])
-        if not cols:
-            continue
+        cols = row.find_all(["td"])
 
-        candidato_cell = cols[1] if len(cols) >= 4 else cols[0]
-        link_tag = candidato_cell.find("a", href=True)
-        wiki_link = (
-            f"https://es.wikipedia.org{link_tag['href']}"
-            if link_tag and link_tag["href"].startswith("/wiki/")
-            else None
-        )
-        candidato = clean_text(candidato_cell.get_text())
-        # if there is a canditate return the candidate with the assigned link
-        if candidato:
-            candidates.append({"candidato": candidato, "wiki_link": wiki_link})
+        partido = cols[0]
+        candidato = cols[1].find("button")
+        vicepresidentes = cols[1].find("ul")
+
+
+        if candidato and partido and vicepresidentes:
+            lista_vice = []
+            for item in vicepresidentes.find_all("li"):
+                lista_vice.append(item.text)        
+            candidates.append({"name": candidato.text, "partido": partido.text.lower()})
 
     return candidates
 
 
-def get_candidate_info(wiki_link):
-    """Retunr the candidate name, age, summary, political party, education, and reference link from wikipedia"""
-    if not wiki_link:
-        return {
-            "name": "not_found",
-            "age": -1,
-            "summary": "not_found",
-            "partido_politico": "not_found",
-            "educacion": "not_found",
-            "ref": "No link found",
-        }
+def extract_candidate_info(name: str):
+    text, url = get_wikipedia_page(name)
+    if not text:
+        return None
 
-    try:
-        html = fetch_page(wiki_link, headers={"User-Agent": HEADERS["User-Agent"]})
-    except requests.RequestException:
-        return {
-            "name": "not_found",
-            "age": -1,
-            "summary": "not_found",
-            "partido_politico": "not_found",
-            "educacion": "not_found",
-            "ref": "Request failed",
-        }
-
-    soup = BeautifulSoup(html, "html.parser")
-
-    # Name
-    name_tag = soup.find("caption") or soup.find("th", {"class": "infobox-above"})
-    if name_tag:
-        name = clean_text(name_tag.get_text(" ", strip=True))
-    else:
-        heading = soup.find("h1", {"id": "firstHeading"})
-        name = clean_text(heading.get_text(strip=True)) if heading else "not_found"
-
-    # Age
-    age = -1
-    birth_row = soup.find("th", string=lambda t: t and "Nacimiento" in t)
-    if birth_row:
-        birth_td = birth_row.find_next("td")
-        if birth_td:
-            match = re.search(r"\((\d+)\s*años", birth_td.get_text(" ", strip=True))
-            if match:
-                age = int(match.group(1))
-
-    # Summary
-    first_p = soup.select_one("p")
-    summary = clean_summary(clean_text(first_p.get_text(" ", strip=True))) if first_p else "not_found"
-
-    # Party
-    partido = "not_found"
-    partido_cell = soup.find("th", string=lambda t: t and ("Partido político" in t or "Partido" in t))
-    if partido_cell:
-        td = partido_cell.find_next("td")
-        if td:
-            for sup in td.find_all("sup"):
-                sup.decompose()
-            partido = clean_text(td.get_text(" ", strip=True)) or "not_found"
-
-    # Education
-    educacion = "not_found"
-    edu_labels = ["Educación", "Formación", "Alma máter", "Universidad", "Estudios"]
-    for label in edu_labels:
-        edu_cell = soup.find("th", string=lambda t: t and label in t)
-        if edu_cell:
-            td = edu_cell.find_next("td")
-            if td:
-                for sup in td.find_all("sup"):
-                    sup.decompose()
-                educacion = clean_text(td.get_text(" ", strip=True)) or "not_found"
-            break
-    
-     # Image
-    image_path = None
-    img_tag = soup.select_one(".infobox img")
-    if img_tag and img_tag.get("src"):
-        img_url = img_tag["src"]
-        if img_url.startswith("//"):
-            img_url = "https:" + img_url
-
-        os.makedirs("etl/candidates/data/images", exist_ok=True)
-        safe_name = unicodedata.normalize('NFKD', name or 'unknown')
-        safe_name = safe_name.encode('ascii', 'ignore').decode('ascii') 
-        safe_name = re.sub(r'[^a-zA-Z0-9_-]', '_', safe_name)
-        filename = f"{safe_name}.jpg"
-        local_path = os.path.join("etl/candidates/images", filename)
-
-        try:
-            img_data = requests.get(img_url, headers=HEADERS, timeout=8).content
-            with open(local_path, "wb") as f:
-                f.write(img_data)
-            image_path = local_path
-        except Exception:
-            image_path = None
-
-    return {
-        "name": name,
-        "age": age,
-        "summary": summary,
-        "partido_politico": partido,
-        "educacion": educacion,
-        "ref": wiki_link or "not_found",
+    schema = {
+        "type": "object",
+        "properties": {
+            "age": {"type": "string"},
+            "educacion": {"type": "string"},
+            "summary": {"type": "string"},
+            "ref": {"type": "array", "items": {"type": "string"}}
+            # ,
+            # "controversies": {
+            #     "type": "array",
+            #     "items": {
+            #         "type": "object",
+            #         "properties": {
+            #             "summary": {"type": "string"},
+            #             "ref": {"type": "array", "items": {"type": "string"}}
+            #         }
+            #     }
+            # },
+            # "accomplishments": {
+            #     "type": "array",
+            #     "items": {
+            #         "type": "object",
+            #         "properties": {
+            #             "summary": {"type": "string"},
+            #             "ref": {"type": "array", "items": {"type": "string"}}
+            #         }
+            #     }
+            # }
+        },
+        "required": ["age","educacion", "summary", "ref"]
     }
+
+    prompt = f"""
+    Eres un analista experto en política peruana.
+    Lee la siguiente información de Wikipedia (en español) sobre el candidato "{name}".
+    Extrae los datos clave en formato JSON según el esquema dado. Para la edad, solo da el numero de cuantos anos tiene
+
+    Si alguna de estas secciones ["age","educacion", "summary", "ref"], no tiene un resultado dale un valor como el siguiente: "age":-1,"summary": "not found", "ref": ["not_found"],"educacion":"not_found". Para "age" debe ser un numero : -1 y "ref" una lista: ["not_found"]
+    Si encuentras hechos relevantes (controversias o logros), incluye una breve descripción
+    y una lista con los enlaces de referencia correspondientes. 
+
+    Texto de Wikipedia:
+    {text[:12000]}  # (limita el texto para evitar desbordes)
+
+    URL: {url}
+    """
+
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=prompt,
+        config={
+            "response_mime_type": "application/json",
+            "response_schema": schema
+        }
+    )
+
+    # fallback in case .parsed isn't set
+    result = getattr(response, "parsed", None) or response.text
+    return result
 
 
 def get_parties_table():
@@ -184,7 +173,7 @@ def get_parties_table():
         conn = psycopg2.connect(database_url)
         cur = conn.cursor()
         cur.execute("""
-            SELECT id, name FROM candidate_data.parties
+            SELECT id, lower(name) FROM candidate_data.parties
             ORDER BY name ASC
         """)
         parties = cur.fetchall()
@@ -236,12 +225,12 @@ def insert_into_table(candidate_dict):
         """)
 
         cur.execute(insert_query, (
-            candidate_dict.get("name", "not_found"),
-            candidate_dict.get("age", -1),
-            candidate_dict.get("partido_politico", "not_found"),
-            candidate_dict.get("educacion", "not_found"),
-            candidate_dict.get("summary", "not_found"),
-            candidate_dict.get("ref", "not_found")
+            candidate_dict.get("name","not_found"),
+            candidate_dict.get("age",-1),
+            candidate_dict.get("partido",-1),
+            candidate_dict.get("educacion","not_found"),
+            candidate_dict.get("summary","not_found"),
+            candidate_dict.get("ref",["not_found"])
         ))
         candidate_id = cur.fetchone()[0]
 
@@ -265,21 +254,28 @@ def main():
     # candidates container
     candidates = []
 
-    for row in raw_candidates:
-        # get the information about the candidate from wikipedia
-        candidate_info = get_candidate_info(row["wiki_link"])
-        # clean the party field
-        clean_partido = re.sub(r"\s*\(.*?\)\s*$", "", candidate_info.get("partido_politico", "")).lower()
-        # assign the party id to the candidate 
-        candidate_info["partido_politico"] = parties.get(clean_partido, None)
+    for candidate in raw_candidates:
         
-        candidate_info = clean_data(candidate_info, parties_names)
+        # get the information about the candidate from wikipedia
 
-        candidates.append(candidate_info)
-        # Insert candidate into table
-        print(candidate_info)
-        #if candidate_info: insert_into_table(candidate_info)
+        # clean the party field
+        partido = candidate["partido"].lower()
+        # assign the party id to the candidate 
+        candidate["partido"] = parties.get(partido, None)
 
+        new_candidate = candidate.copy()
+        
+        candidate_info = extract_candidate_info(candidate["name"])
+        if isinstance(candidate_info, dict):
+            new_candidate.update(candidate_info)
+        else:
+            new_candidate.update({"age":-1,"summary": "not found", "ref": ["not_found"],"educacion":"not_found"})
+
+        candidates.append(new_candidate)
+        # # Insert candidate into table
+        if new_candidate: 
+            insert_into_table(new_candidate)
+        
 if __name__ == "__main__":
     main()
 

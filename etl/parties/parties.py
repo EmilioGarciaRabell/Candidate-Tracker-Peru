@@ -8,48 +8,64 @@ from dotenv import load_dotenv
 import psycopg2
 from psycopg2 import sql
 load_dotenv()
-BASE_URL = "https://rpp.pe/politica/elecciones/elecciones-2026-conoce-cuales-son-los-partidos-politicos-inscritos-y-los-que-estan-en-proceso-de-inscripcion-noticia-1572877"
+from google import genai
+import wikipediaapi
+import os
+
+# --- Setup ---
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+client = genai.Client(api_key=GEMINI_API_KEY)
+
+BASE_URL = "https://elcomercio.pe/elecciones/elecciones-2026-jne-candidatos-presidenciales-estos-son-los-mas-de-60-aspirantes-que-se-proyectan-hacia-el-sillon-presidencial-en-las-proximas-elecciones-del-12-de-abril-elecciones-primarias-noticia/"
 
 def fetch_page(url):
     res = requests.get(url)
     res.raise_for_status()
     return res.text
 
-def find_ol(html):
+def get_parties(html):
     soup = BeautifulSoup(html, "lxml")
-    ol_tag = soup.find("ol")
-    return ol_tag
+    table = soup.find("table", {"aria-label": "Organizaciones políticas y candidatos"})
+    if not table:
+        raise Exception("No se encontró la tabla de candidatos.")
 
-def format_names_list_from_ol(data):
-    parties = []
-    if data:
-        items = [li.get_text(strip=True) for li in data.find_all("li")]
+    parties = set()
+    list_candidates = []
+    # get all the tr tags
+    for row in table.find_all("tr")[1:]:
+        cols = row.find_all(["td"])
 
-        for item in items:
-     
-            name = item.lower().split("fecha de inscripción")[0].strip()
-            parties.append({"name": name})
-        return parties
+        partido = cols[0]
+        if partido:
+            parties.add(partido.text)
+    
+    for party in parties:
+        list_candidates.append({"name":party})
 
-def get_wiki_link(party_name):
-    query = f'"{party_name} (partido PERU)" site:es.wikipedia.org'
-    params = {
-    "engine": "google",
-    "q": query,
-    "api_key": os.environ.get('SERAPI')
-    }
-    search = GoogleSearch(params)
-    results = search.get_dict().get("organic_results", [])
+    return list_candidates
 
-    if results:
-        return results[0].get("link")
-    else:
-        return None
+def get_wikipedia_page(name: str):
+    wiki = wikipediaapi.Wikipedia(
+        language='es',
+        user_agent='candidate-info-fetcher/1.0 (contact@example.com)'
+    )
+    page = wiki.page(name)
+    if not page.exists():
+        return None, None, []
+    
+    # Collect reference links if available
+    references = []
+    for link_title in page.references.keys() if hasattr(page, "references") else []:
+        link = page.references[link_title]
+        if link and link.startswith("http"):
+            references.append(link)
+
+    return page.text, page.fullurl, references
 
 
 def get_party_info(wiki_link):
     if not wiki_link:
-        return {"summary": None, "position": None, "ref": None, "error": "No link found"}
+        return {"summary": None, "position": None, "ref": ["not_found"], "error": "No link found"}
 
     headers = {
         "User-Agent": (
@@ -72,7 +88,7 @@ def get_party_info(wiki_link):
     if first_p:
         summary = first_p.get_text(" ", strip=True)
         # Replace multiple whitespace or zero-width characters
-        summary = re.sub(r"[\u200b]+", " ", summary)
+        summary = re.sub(r"\u200b+", " ", summary)
         summary = re.sub(r"\s+", " ", summary)
     else:
         summary = "No summary found."
@@ -98,8 +114,8 @@ def get_party_info(wiki_link):
             position = "Not listed."
     else:
         position = "Not listed."
-
-    return {"summary": summary, "position": position, "ref": wiki_link}
+    
+    return {"summary": summary, "position": position, "ref": [wiki_link]}
 
 def insert_into_table(party_dict):
     database_url = os.environ.get("DATABASE_URL")
@@ -129,7 +145,6 @@ def insert_into_table(party_dict):
             (party_dict["name"], party_dict["position"], party_dict["summary"], party_dict["ref"])
         )
         party_id = cur.fetchone()[0]
-
         conn.commit()
         cur.close()
         conn.close()
@@ -149,26 +164,20 @@ def insert_into_table(party_dict):
     
 def main():
     html = fetch_page(BASE_URL)
-    data = find_ol(html)
-    parties = format_names_list_from_ol(data)
+    parties = get_parties(html)
     
     for party in parties:
         name = party.get('name')
         if not name:
             continue
         link = get_wiki_link(name)
-        party_info = get_party_info(link) if link else {"summary": "not found", "position": "not found", "ref": "not_found"}
+        party_info = get_party_info(link) if link else {"summary": "not found", "position": "not found", "ref": ["not_found"]}
         if isinstance(party_info, dict):
             party.update(party_info)
             
         else:
-            # fallback if something went wrong
-            party.update({"summary": "not found", "position": "not found", "ref": "not_found"})
+            party.update({"summary": "not found", "position": "not found", "ref": ["not_found"]})
+
         insert_into_table(party)
-
-            
-
-
-
 if __name__ == "__main__":
     main()
