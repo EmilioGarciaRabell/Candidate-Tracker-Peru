@@ -22,7 +22,7 @@ def get_tweets_and_comments(candidate):
     all_tweets = []
     page = 1
 
-    while True:
+    while page < 3: #while True:
         response = requests.get(endpoint, headers=headers, params=params)
 
         if response.status_code != 200:

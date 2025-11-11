@@ -74,10 +74,7 @@ def get_candidate_sentiment(candidate:str, id: int):
     # Apply sentiment analysis 
     overall_sentiment, posts_info = process_content_sentiment(overall_content)
     sentiment_result = llm.get_sentiment_summary(candidate, overall_sentiment, posts_info)
-    
-    
-
-    insert_sentiment(sentiment_result, id)
+    return sentiment_result
 
 def get_candidates_id():
     # get canditate name and ID
