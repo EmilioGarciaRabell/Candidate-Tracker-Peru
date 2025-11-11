@@ -95,4 +95,4 @@ def extract_candidate_info(name: str):
 
 # --- Example ---
 if __name__ == "__main__":
-    print(get_wikipedia_page("Alfonso López-Chau"))
+    print(get_wikipedia_page("Rafael López Aliaga"))
