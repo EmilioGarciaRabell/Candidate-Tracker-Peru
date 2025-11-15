@@ -10,7 +10,8 @@ import "bulma/css/bulma.min.css";
 
 export default function CandidatePage() {
   const params = useParams();
-  const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
+  const id = Array.isArray(params?.id) ? params.id[0] : (params?.id as string | undefined);
+
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<
@@ -19,7 +20,6 @@ export default function CandidatePage() {
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  // Fetch Candidate
   useEffect(() => {
     if (!id) {
       setLoading(false);
@@ -46,9 +46,6 @@ export default function CandidatePage() {
     };
   }, [id, apiUrl]);
 
-  if (loading) return <p className="has-text-centered mt-6">Loading...</p>;
-  if (!candidate) return <p className="has-text-centered mt-6">Candidate not found</p>;
-
   const tabs = [
     ["historia", "Historia"],
     ["antecedentes", "Antecedentes"],
@@ -57,16 +54,72 @@ export default function CandidatePage() {
     ["redes", "Redes Sociales"],
   ] as const;
 
+  if (loading) {
+    return (
+      <section className={`section ${styles.pageBg}`}>
+        <div className="container">
+          <div className={`${styles.skeletonHero} mb-5`} />
+          <div className="columns is-variable is-6">
+            <aside className="column is-12-mobile is-4-tablet is-3-desktop">
+              <div className={`${styles.cardSoft} ${styles.skeletonBlock}`} />
+            </aside>
+            <div className="column">
+              <div className={`${styles.boxSoft} ${styles.skeletonBlock} mb-4`} />
+              <div className={`${styles.boxSoft} ${styles.skeletonBlock}`} />
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!candidate) {
+    return (
+      <section className={`section ${styles.pageBg}`}>
+        <div className="container has-text-centered">
+          <div className="box is-inline-block">
+            <p className="title is-4 mb-2">Candidate not found</p>
+            <p className="has-text-grey">
+              Verifica el enlace o intenta nuevamente más tarde.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="section has-background-white-ter">
+    <section className={`section ${styles.pageBg}`}>
       <div className="container">
+        {/* HEADER / HERO */}
+        <div className={`hero ${styles.heroSoft}`}>
+          <div className="hero-body py-5">
+            <nav className="breadcrumb is-small mb-2" aria-label="breadcrumbs">
+              <ul>
+                <li><a href="/">Inicio</a></li>
+                <li className="is-active"><a aria-current="page">Candidato</a></li>
+              </ul>
+            </nav>
 
-        <div className="columns is-variable is-6">
+            <h1 className="title is-3 mb-1">{candidate.name}</h1>
+            <p className="subtitle is-6 has-text-grey-dark">
+              {candidate.party_id ? (
+                <>
+                  <span className={`tag is-info is-light ${styles.tagElevated}`}>
+                    Partido {candidate.party_id}
+                  </span>
+                </>
+              ) : (
+                <span className={`tag is-light ${styles.tagElevated}`}>Sin partido asignado</span>
+              )}
+            </p>
+          </div>
+        </div>
 
+        <div className="columns is-variable is-6 mt-5">
           {/* LEFT SIDEBAR */}
-          <aside className="column is-one-quarter">
-
-            <div className="card" style={{ borderRadius: 12 }}>
+          <aside className="column is-12-mobile is-4-tablet is-3-desktop">
+            <div className={`${styles.cardSoft} card ${styles.stickyAside}`}>
               {/* Photo */}
               <div className="card-image">
                 <figure className={`image is-square ${styles.imageWrapper}`}>
@@ -76,14 +129,14 @@ export default function CandidatePage() {
                     width={500}
                     height={500}
                     className={styles.profileImage}
+                    priority
                   />
                 </figure>
               </div>
 
               {/* Experience */}
               <div className="card-content">
-                <p className="title is-5 mb-3">Experiencia Laboral</p>
-
+                <p className="title is-6 mb-3">Experiencia Laboral</p>
                 {candidate.summary ? (
                   <p className="is-size-7 has-text-grey">{candidate.summary}</p>
                 ) : (
@@ -93,75 +146,76 @@ export default function CandidatePage() {
                 )}
               </div>
             </div>
-
           </aside>
 
           {/* MAIN CONTENT */}
           <div className="column">
-
-            {/* Candidate Name */}
-            <h2 className="title is-3 mb-1">{candidate.name}</h2>
-            <p className="subtitle is-6 has-text-grey-dark mb-4">
-              {candidate.party_id
-                ? `Partido ${candidate.party_id}`
-                : "Sin partido asignado"}
-            </p>
-
             {/* TABS */}
-            <div className={`tabs ${styles.cleanTabs}`}>
+            <nav className={styles.navBar} role="tablist">
+              {tabs.map(([key, label]) => {
+                const isActive = activeTab === key;
+                return (
+                  <button
+                    key={key}
+                    className={`${styles.navItem} ${isActive ? styles.active : ""}`}
+                    onClick={() => setActiveTab(key as typeof activeTab)}
+                    aria-selected={isActive}
+                    aria-controls={`panel-${key}`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </nav>
 
 
-              <ul>
-                {tabs.map(([key, label]) => (
-                  <li key={key} className={activeTab === key ? "is-active" : ""}>
-                    <a onClick={() => setActiveTab(key as any)}>
-                      <span>{label}</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* MAIN CONTENT BOX */}
-            <div className="box has-background-white" style={{ borderRadius: 10 }}>
-
+            {/* CONTENT BOX */}
+            <div className={`box ${styles.boxSoft}`} id={`panel-${activeTab}`} role="tabpanel">
               {activeTab === "historia" && (
                 <>
                   <h3 className="title is-5">Acerca de mí</h3>
-                  <p>{candidate.summary ?? "No hay información disponible."}</p>
+                  <p className="content">
+                    {candidate.summary ?? "No hay información disponible."}
+                  </p>
                 </>
               )}
 
               {activeTab === "antecedentes" && (
                 <>
                   <h3 className="title is-5">Antecedentes</h3>
-                  <p>No hay antecedentes registrados.</p>
+                  <div className={styles.subtleDivider} />
+                  <p className="has-text-grey">
+                    No hay antecedentes registrados.
+                  </p>
                 </>
               )}
 
               {activeTab === "opinionPublica" && (
-                <PublicOpinionSection candidateId={candidate.id} />
+                <>
+                  <h3 className="title is-5">Opinión Pública</h3>
+                  <div className={styles.subtleDivider} />
+                  <PublicOpinionSection candidateId={candidate.id} />
+                </>
               )}
 
               {activeTab === "propuestas" && (
                 <>
                   <h3 className="title is-5">Propuestas</h3>
-                  <p>No se han registrado propuestas.</p>
+                  <div className={styles.subtleDivider} />
+                  <p className="has-text-grey">No se han registrado propuestas.</p>
                 </>
               )}
 
               {activeTab === "redes" && (
                 <>
                   <h3 className="title is-5">Redes Sociales</h3>
-                  <p>No hay redes sociales registradas.</p>
+                  <div className={styles.subtleDivider} />
+                  <p className="has-text-grey">No hay redes sociales registradas.</p>
                 </>
               )}
-
             </div>
-
           </div>
         </div>
-
       </div>
     </section>
   );

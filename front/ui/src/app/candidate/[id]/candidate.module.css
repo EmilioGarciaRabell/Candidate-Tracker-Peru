@@ -413,3 +413,184 @@
     padding: 12px 15px;
   }
 }
+
+
+
+
+/* Light page background */
+.pageBg {
+  background: linear-gradient(180deg, #fafafa 0%, #ffffff 40%);
+}
+
+/* Soft hero with gentle border + blur feel */
+.heroSoft {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(10, 10, 10, 0.06);
+  border-radius: 14px;
+  box-shadow: 0 6px 24px rgba(10, 10, 10, 0.04);
+  backdrop-filter: saturate(1.1) blur(4px);
+}
+
+/* Elevated tag chip */
+.tagElevated {
+  box-shadow: 0 4px 14px rgba(10, 10, 10, 0.06);
+  border-radius: 999px;
+}
+
+/* Sticky aside on larger screens */
+.stickyAside {
+  position: sticky;
+  top: 1.25rem;
+}
+
+/* Card + Box “soft” style: rounded and airy */
+.cardSoft {
+  border-radius: 14px !important;
+  overflow: hidden;
+  border: 1px solid rgba(10, 10, 10, 0.06);
+  box-shadow: 0 12px 32px rgba(10, 10, 10, 0.05);
+  background: #fff;
+}
+
+.boxSoft {
+  border-radius: 12px !important;
+  border: 1px solid rgba(10, 10, 10, 0.06);
+  box-shadow: 0 12px 32px rgba(10, 10, 10, 0.04);
+  background: #fff;
+}
+
+/* Tabs cleanup */
+.cleanTabs {
+  margin-bottom: 1rem;
+}
+
+.tabButton {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+/* Subtle divider line */
+.subtleDivider {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(10, 10, 10, 0.08) 30%,
+    rgba(10, 10, 10, 0.08) 70%,
+    transparent 100%
+  );
+  margin: 0.5rem 0 1rem;
+}
+
+/* Image styles */
+.imageWrapper {
+  padding: 0.75rem;
+  background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
+}
+
+.profileImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid rgba(10, 10, 10, 0.06);
+  box-shadow: 0 10px 28px rgba(10, 10, 10, 0.06);
+}
+
+/* Skeleton loading (pure CSS) */
+@keyframes pulseFade {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.skeletonHero {
+  height: 120px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #f3f3f3 0%, #f8f8f8 50%, #f3f3f3 100%);
+  background-size: 200% 100%;
+  animation: pulseFade 1.4s ease-in-out infinite;
+  border: 1px solid rgba(10,10,10,0.05);
+}
+
+.skeletonBlock {
+  height: 180px;
+  background: linear-gradient(90deg, #f3f3f3 0%, #f8f8f8 50%, #f3f3f3 100%);
+  background-size: 200% 100%;
+  animation: pulseFade 1.4s ease-in-out infinite;
+  border-radius: 12px;
+  border: 1px solid rgba(10,10,10,0.05);
+}
+
+/* Prefer compact spacing on very small screens */
+@media (max-width: 768px) {
+  .heroSoft { border-radius: 12px; }
+  .cardSoft { border-radius: 12px !important; }
+  .boxSoft  { border-radius: 10px !important; }
+}
+
+
+
+.navBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.25rem;
+}
+
+/* Tab buttons */
+.navItem {
+  background: none;
+  border: none;
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  font-size: 15px;
+  color: #555;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.25s ease;
+}
+
+.navItem:hover {
+  color: #111;
+}
+
+/* Active tab underline */
+.active {
+  color: #111;
+}
+
+.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #00b8d9, #0070f3);
+  border-radius: 1px;
+  transition: width 0.3s ease;
+}
+
+/* Optional subtle hover underline for inactive */
+.navItem:not(.active)::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  width: 0;
+  height: 2px;
+  background: #ddd;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.navItem:not(.active):hover::after {
+  width: 40%;
+}

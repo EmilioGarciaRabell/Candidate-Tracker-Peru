@@ -1,36 +1,91 @@
-import Link from 'next/link'
+"use client";
+
+import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import styles from "./navbar.module.css";
+import "bulma/css/bulma.min.css";
 
+const navItems = [
+  { href: "/candidates", label: "Candidatos" },
+  { href: "/news", label: "Noticias" },
+  { href: "/dashboard", label: "Tendencias" },
+];
 
-export default function Navbar(){
-    return (
-        <header className='header'>
-            <div className='div1'>
-                <div className="navflex">
+export default function Navbar() {
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
 
-                    <div className='logo'>
-                        <Link href="/" className="flex">
-                            <Image 
-                            src="/logo.svg"
-                            alt="imagen del landing page"
-                            width={70}
-                            height={70}
-                            className="cursor-pointer hover:scale-105 transition-transform duration-200"
-                            >
-                            </Image>
-                        </Link>
-                    </div>
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 6);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
-                    <div className="links">
-                            <Link href="/candidates" className="nav-link">Candidatos</Link>
-                            <Link href="/candidates" className="nav-link">Noticias</Link>
-                            <Link href="/dashboard" className="nav-link">Tendencias</Link>
-                    </div>
+  return (
+    <header className={styles.headerWrap}>
+      <nav
+        className={`navbar ${styles.navbarLight} ${scrolled ? styles.scrolled : ""}`}
+        role="navigation"
+        aria-label="main navigation"
+      >
+        <div className="container">
+          <div className="navbar-brand">
+            <Link href="/" className={`navbar-item ${styles.logoLink}`} aria-label="Inicio">
+              <Image
+                src="/logo.svg"
+                alt="Logo"
+                width={72}
+                height={72}
+                className={styles.logoImg}
+                priority
+              />
+            </Link>
 
-                  <a href="#" title="" className="customButton hidden lg:inline-flex items-center justify-center " role="button"> Explora ahora </a>
+            <button
+              className={`navbar-burger ${open ? "is-active" : ""}`}
+              aria-label="Abrir menú"
+              aria-expanded={open}
+              onClick={() => setOpen((v) => !v)}
+              type="button"
+            >
+              <span aria-hidden="true" />
+              <span aria-hidden="true" />
+              <span aria-hidden="true" />
+            </button>
+          </div>
 
-                </div>
+          <div className={`navbar-menu ${open ? "is-active" : ""}`}>
+            <div className={`navbar-start ${styles.navStart}`}>
+              {navItems.map(({ href, label }) => {
+                const isActive = href === "/" ? pathname === "/" : pathname?.startsWith(href);
+                return (
+                  <Link
+                    key={href + label}
+                    href={href}
+                    className={`${styles.navItem} ${isActive ? styles.active : ""}`}
+                    aria-current={isActive ? "page" : undefined}
+                    onClick={() => setOpen(false)}
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="navbar-end">
+              <div className="navbar-item">
+                <Link href="/explore" className={styles.cta} onClick={() => setOpen(false)}>
+                  Explora ahora
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
-        </header>
-    )
+      </nav>
+    </header>
+  );
 }
