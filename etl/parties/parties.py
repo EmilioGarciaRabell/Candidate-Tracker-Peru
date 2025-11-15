@@ -11,6 +11,8 @@ load_dotenv()
 from google import genai
 import wikipediaapi
 import os
+from serpapi import GoogleSearch
+
 
 # --- Setup ---
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
@@ -44,78 +46,7 @@ def get_parties(html):
 
     return list_candidates
 
-def get_wikipedia_page(name: str):
-    wiki = wikipediaapi.Wikipedia(
-        language='es',
-        user_agent='candidate-info-fetcher/1.0 (contact@example.com)'
-    )
-    page = wiki.page(name)
-    if not page.exists():
-        return None, None, []
-    
-    # Collect reference links if available
-    references = []
-    for link_title in page.references.keys() if hasattr(page, "references") else []:
-        link = page.references[link_title]
-        if link and link.startswith("http"):
-            references.append(link)
-
-    return page.text, page.fullurl, references
-
-
-def get_party_info(wiki_link):
-    if not wiki_link:
-        return {"summary": None, "position": None, "ref": ["not_found"], "error": "No link found"}
-
-    headers = {
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/141.0.0.0 Safari/537.36"
-        )
-    }
-
-    try:
-        res = requests.get(wiki_link, headers=headers, timeout=5)
-        res.raise_for_status()
-    except requests.RequestException as e:
-        return {"summary": None, "position": None, "error": str(e)}
-
-    soup = BeautifulSoup(res.text, "html.parser")
-
-    # --- Summary ---
-    first_p = soup.select_one("p")
-    if first_p:
-        summary = first_p.get_text(" ", strip=True)
-        # Replace multiple whitespace or zero-width characters
-        summary = re.sub(r"\u200b+", " ", summary)
-        summary = re.sub(r"\s+", " ", summary)
-    else:
-        summary = "No summary found."
-
-    # --- Political Position ---
-    position_cell = soup.find(
-        "th", string=lambda t: t and ("Position" in t or "Posición" in t)
-    )
-    if position_cell:
-        position_td = position_cell.find_next("td")
-        if position_td:
-            # Remove reference tags
-            for sup in position_td.find_all("sup"):
-                sup.decompose()
-            position = position_td.get_text(" ", strip=True)
-            # Remove zero-width spaces
-            position = re.sub(r"[\u200b]+", " ", position)
-            # Remove faction notes if present
-            position = re.split(r"Facciones?:", position)[0].strip()
-            # Collapse multiple spaces
-            position = re.sub(r"\s+", " ", position)
-        else:
-            position = "Not listed."
-    else:
-        position = "Not listed."
-    
-    return {"summary": summary, "position": position, "ref": [wiki_link]}
+import wikipedia
 
 def insert_into_table(party_dict):
     database_url = os.environ.get("DATABASE_URL")
@@ -161,23 +92,164 @@ def insert_into_table(party_dict):
         if conn:
             conn.close()
         return None
+
+##Code for updating parties  summary
+def get_wiki_page(party):
+    try:
+        wikipedia.set_lang("es-formal")
+        page = wikipedia.page(party)
+        if page:
+            return page.url
+        return None
+    except Exception as e:
+         print(e)
+         return None
+
+def get_wikipedia_page(name: str):
+    wiki = wikipediaapi.Wikipedia(
+        language='es',
+        user_agent='candidate-info-fetcher/1.0 (contact@example.com)'
+    )
+    page = wiki.page(name)
+    if not page.exists():
+        return None, None
+
+    return  page.text, page.fullurl
+def get_parties_table():
+    """Get the contents of the parties table"""
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        print("DATABASE_URL not found in environment")
+        return None, []
+
+    try:
+        conn = psycopg2.connect(database_url)
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, name FROM candidate_data.parties
+            ORDER BY name ASC
+        """)
+        parties = cur.fetchall()
+        conn.close()
+
+        formatted_parties = {p[1].lower(): p[0] for p in parties}
+        parties_names = [p[1] for p in parties]
+
+        return formatted_parties, parties_names
+
+    except Exception as e:
+        print("Error while accessing parties table:", e)
+        return None, []
+    
+def extract_party_info(text,url,name):
+    if not text:
+        return None
+    schema = {
+        "type": "object",
+        "properties": {
+            "ideology": {"type": "string"},
+            "summary": {"type": "string"},
+            "ref": {"type": "array", "items": {"type": "string"}}
+        },
+        "required": ["ideology", "summary", "ref"]
+    }
+
+    prompt = f"""
+    Eres un analista experto en política peruana.
+    Lee la siguiente información sobre el partido politico "{name}".
+    Extrae los datos clave en formato JSON según el esquema dado. 
+    Si alguna de estas secciones ["ideology", "summary", "ref"], no tiene un resultado dale un valor como el siguiente: "ideology":"not found"","summary": "not found", "ref": ["not_found"]. Para "ref" debe ser  una lista: ["not_found"] 
+
+    Texto de Wikipedia:
+    {text[:12000]}  # (limita el texto para evitar desbordes)
+
+    URL: {url}
+    """
+
+    response = client.models.generate_content(
+        model="gemini-2.0-flash",
+        contents=prompt,
+        config={
+            "response_mime_type": "application/json",
+            "response_schema": schema
+        }
+    )
+
+    # fallback in case .parsed isn't set
+    result = getattr(response, "parsed", None) or response.text
+    return result                                                 
+
+def insert_into_table(name,party_dict):
+    """update candidate info table"""
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        print("DATABASE_URL not found in environment")
+        return None
+
+    try:
+        conn = psycopg2.connect(database_url)
+        cur = conn.cursor()
+
+        insert_query = sql.SQL("""
+            UPDATE candidate_data.parties
+            SET position = %s,
+                summary = %s,
+                ref = %s
+            WHERE name = %s;
+        """)
+
+
+        cur.execute(insert_query, (
+            party_dict.get("ideology",-1),
+            party_dict.get("summary","not_found"),
+            party_dict.get("ref",["not_found"]),
+            name,
+
+        ))
+
+        conn.commit()
+        conn.close()
+
+    except Exception as e:
+        print("Error inserting candidate:", e)
+        if conn:
+            conn.rollback()
+            conn.close()
+        return None
+
+def update_party_info():
+    _,party_names = get_parties_table()
+    
+    for party in party_names:
+        text = ""
+        url = ""
+        if party == "Alianza para el Progreso":
+            text,url = get_wikipedia_page("Alianza_para_el_Progreso_(Perú)")
+        else:
+            text, url = get_wikipedia_page(party)
+        result = extract_party_info(text,url,party)
+        if not result:
+            result = {"ideology":"not found","summary": "not found", "ref": ["not_found"]}
+        insert_into_table(party,result)
+
+
+def get_party_website(name,num_results):
+    params = {
+        "engine": "google",
+        "q": f"{name} partido politico peru",
+        "num": num_results,
+        "api_key": os.environ.get("SERAPI")
+    }
+    search = GoogleSearch(params)
+    res = search.get_dict()
+    return res.get("organic_results", [])
+
+
     
 def main():
-    html = fetch_page(BASE_URL)
-    parties = get_parties(html)
+    print(get_party_website("Fe en el Peru", 1))
+    # print(get_wikipedia_page('Alianza_para_el_Progreso_(Perú)'))
     
-    for party in parties:
-        name = party.get('name')
-        if not name:
-            continue
-        link = get_wiki_link(name)
-        party_info = get_party_info(link) if link else {"summary": "not found", "position": "not found", "ref": ["not_found"]}
-        if isinstance(party_info, dict):
-            party.update(party_info)
-            
-        else:
-            party.update({"summary": "not found", "position": "not found", "ref": ["not_found"]})
 
-        insert_into_table(party)
 if __name__ == "__main__":
     main()

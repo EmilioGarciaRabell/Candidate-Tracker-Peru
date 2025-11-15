@@ -36,19 +36,6 @@ def fetch_page(url, headers=HEADERS):
     res.raise_for_status()
     return res.text
 
-
-def clean_text(text):
-    return re.sub(r"\s+", " ", text.replace("\xa0", " ")).strip()
-
-
-def clean_summary(summary):
-    if not summary:
-        return summary
-    summary = re.sub(r"\[\s*\d+\s*\]", "", summary)  # Remove references like [1], [ 2 ]
-    summary = re.sub(r"\s{2,}", " ", summary).strip()
-    return summary
-
-
 def get_wikipedia_page(name: str):
     wiki = wikipediaapi.Wikipedia(
         language='es',
@@ -66,6 +53,7 @@ def get_wikipedia_page(name: str):
             references.append(link)
 
     return page.text, page.fullurl
+
 
 
 
@@ -188,22 +176,6 @@ def get_parties_table():
         print("Error while accessing parties table:", e)
         return None, []
 
-
-def clean_data(data, parties_names):
-
-    name = data.get("name", "")
-    summary = data.get("summary", "")
-
-    if not name or name.lower().startswith(("archivo", "venceremos")):
-        return
-    if any(name.lower().startswith(p.lower()) for p in parties_names):
-        return
-    # if len(name.split()) < 2 and not summary:
-    #     return
-    if any(x in summary.lower() for x in ["haz clic", "creativecommons", "logo", "publicdomain"]):
-        return
-    
-    return data
 
 
 def insert_into_table(candidate_dict):
