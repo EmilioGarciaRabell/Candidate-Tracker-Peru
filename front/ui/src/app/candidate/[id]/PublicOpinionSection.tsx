@@ -1,97 +1,193 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import styles from "./PublicOpinionSection.module.css";
 
 interface SentimentData {
   positive: number;
   negative: number;
   neutral: number;
-  title: string;
-  content: string;
+  title?: string;
+  content?: string;
 }
 
 interface Props {
   candidateId: number;
 }
 
-const PublicOpinionSection: React.FC<Props> = ({ candidateId }) => {
+export default function PublicOpinionSection({ candidateId }: Props) {
   const [sentiment, setSentiment] = useState<SentimentData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState<string | null>(null);
+
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
 
   useEffect(() => {
+    let cancelled = false;
+
     const url = apiUrl
       ? `${apiUrl}/candidate/sentiment/${candidateId}`
       : `/candidate/sentiment/${candidateId}`;
 
-    const load = async () => {
+    const parseMaybeJson = (txt: string) => {
       try {
-        const res = await fetch(url, { cache: "no-store" });
-        const text = await res.text();
-        const parsed = JSON.parse(text);
-        setSentiment(parsed.sentiment ?? null);
+        return JSON.parse(txt);
       } catch {
-        setSentiment(null);
-      } finally {
-        setLoading(false);
+        // fall back: try to extract numbers if server sometimes returns raw text
+        return null;
       }
     };
 
-    load();
+    (async () => {
+      setLoading(true);
+      setErr(null);
+      try {
+        const res = await fetch(url, { cache: "no-store" });
+        const text = await res.text();
+        const parsed = parseMaybeJson(text);
+        const s: SentimentData | null =
+          parsed?.sentiment ?? parsed ?? null;
+
+        if (!cancelled) setSentiment(s);
+      } catch (e: any) {
+        if (!cancelled) {
+          setErr(e?.message || "No se pudo cargar la opinión pública.");
+          setSentiment(null);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [candidateId, apiUrl]);
 
-  if (loading) return <p>Cargando datos…</p>;
-  if (!sentiment) return <p>No hay datos disponibles.</p>;
+  const computed = useMemo(() => {
+    const p = sentiment?.positive ?? 0;
+    const n = sentiment?.negative ?? 0;
+    const u = sentiment?.neutral ?? 0;
+    const total = Math.max(p + n + u, 1); // avoid NaN
+    const pct = {
+      pos: (p / total) * 100,
+      neg: (n / total) * 100,
+      neu: (u / total) * 100,
+    };
+    const overall =
+      pct.pos > 60 ? "Mayormente positivo"
+      : pct.neg > 60 ? "Mayormente negativo"
+      : "Opinión mixta";
 
-  const { positive, neutral, negative } = sentiment;
-  const total = positive + neutral + negative || 1;
+    return { p, n, u, total, pct, overall };
+  }, [sentiment]);
 
-  const posPct = (positive / total) * 100;
-  const neuPct = (neutral / total) * 100;
-  const negPct = (negative / total) * 100;
+  const fmt = (v: number) => Intl.NumberFormat().format(v);
+  const fpct = (v: number) => `${Math.round(v)}%`;
 
-  const overall = (() => {
-    if (posPct > 60) return "Mayormente Positivo";
-    if (negPct > 60) return "Mayormente Negativo";
-    return "Opinión Mixta";
-  })();
+  /* ---------- States ---------- */
+  if (loading) {
+    return (
+      <section aria-busy="true" aria-label="Opinión pública" className={styles.wrap}>
+        <div className={styles.headerRow}>
+          <span className={styles.kicker}>Opinión pública</span>
+          <span className={styles.badgeSkeleton} />
+        </div>
+        <div className={styles.titleSkeleton} />
+        <div className={styles.barSkeleton} />
+        <div className={styles.statsSkeleton} />
+      </section>
+    );
+  }
 
+  if (err) {
+    return (
+      <section aria-live="polite" className={styles.wrap}>
+        <div className={styles.headerRow}>
+          <span className={styles.kicker}>Opinión pública</span>
+        </div>
+        <div className={styles.errorBox}>
+          {err}
+        </div>
+      </section>
+    );
+  }
+
+  if (!sentiment) {
+    return (
+      <section className={styles.wrap}>
+        <div className={styles.headerRow}>
+          <span className={styles.kicker}>Opinión pública</span>
+        </div>
+        <p className={styles.muted}>No hay datos disponibles.</p>
+      </section>
+    );
+  }
+
+  /* ---------- UI ---------- */
   return (
-    <div >
-      <div className={styles.headerSmall}>OPINIÓN PÚBLICA</div>
-      <div className={styles.mainTitle}>{overall}</div>
-
-      {/* Segmented bar (no text inside) */}
-      <div className={styles.barContainer}>
-        <div className={styles.segmentNegative} style={{ width: `${negPct}%` }} />
-        <div className={styles.segmentNeutral} style={{ width: `${neuPct}%` }} />
-        <div className={styles.segmentPositive} style={{ width: `${posPct}%` }} />
+    <section aria-label="Opinión pública" className={styles.wrap}>
+      <div className={styles.headerRow}>
+        <span className={styles.kicker}>Opinión pública</span>
+        <span className={styles.badge}>{computed.overall}</span>
       </div>
 
-      {/* Sentiment numbers */}
+      {/* Segmented bar with accessible labels */}
+      <figure
+        className={styles.barContainer}
+        role="img"
+        aria-label={`Distribución: ${fpct(computed.pct.neg)} negativo, ${fpct(computed.pct.neu)} neutral, ${fpct(computed.pct.pos)} positivo`}
+      >
+        <div
+          className={styles.segmentNegative}
+          style={{ width: `${computed.pct.neg}%` }}
+          aria-hidden="true"
+          title={`Negativo ${fpct(computed.pct.neg)}`}
+        />
+        <div
+          className={styles.segmentNeutral}
+          style={{ width: `${computed.pct.neu}%` }}
+          aria-hidden="true"
+          title={`Neutral ${fpct(computed.pct.neu)}`}
+        />
+        <div
+          className={styles.segmentPositive}
+          style={{ width: `${computed.pct.pos}%` }}
+          aria-hidden="true"
+          title={`Positivo ${fpct(computed.pct.pos)}`}
+        />
+      </figure>
+
+      {/* Legend / numbers */}
       <div className={styles.statsRow}>
         <div className={styles.stat}>
+          <span className={`${styles.dot} ${styles.dotNeg}`} aria-hidden="true" />
           <span className={styles.label}>Negativo</span>
-          <span className={styles.value}>{negative}</span>
+          <span className={styles.value}>
+            {fmt(computed.n)} <span className={styles.pct}>({fpct(computed.pct.neg)})</span>
+          </span>
         </div>
         <div className={styles.stat}>
+          <span className={`${styles.dot} ${styles.dotNeu}`} aria-hidden="true" />
           <span className={styles.label}>Neutral</span>
-          <span className={styles.value}>{neutral}</span>
+          <span className={styles.value}>
+            {fmt(computed.u)} <span className={styles.pct}>({fpct(computed.pct.neu)})</span>
+          </span>
         </div>
         <div className={styles.stat}>
+          <span className={`${styles.dot} ${styles.dotPos}`} aria-hidden="true" />
           <span className={styles.label}>Positivo</span>
-          <span className={styles.value}>{positive}</span>
+          <span className={styles.value}>
+            {fmt(computed.p)} <span className={styles.pct}>({fpct(computed.pct.pos)})</span>
+          </span>
         </div>
       </div>
 
-      {/* Article */}
+      {/* Optional article */}
       {(sentiment.title || sentiment.content) && (
-        <div className={styles.article}>
-          {sentiment.title && <h4 className={styles.articleTitle}>{sentiment.title}</h4>}
+        <article className={styles.article} aria-labelledby="op-art-title">
+          {sentiment.title && <h4 id="op-art-title" className={styles.articleTitle}>{sentiment.title}</h4>}
           {sentiment.content && <p className={styles.articleText}>{sentiment.content}</p>}
-        </div>
+        </article>
       )}
-    </div>
+    </section>
   );
-};
-
-export default PublicOpinionSection;
+}

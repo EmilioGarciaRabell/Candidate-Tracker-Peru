@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify
-from src.services.data_management import candidates, sentiment
+from src.services.data_management import candidates, sentiment, social_media
 
 candidate_bp = Blueprint('candidate_bp', __name__)
 
@@ -25,3 +25,10 @@ def get_candidate_sentiment(id):
     if not sentiment_anal:
         return jsonify({"error": "Sentiment not found"}), 404
     return jsonify ({"sentiment": sentiment_anal}), 200
+
+@candidate_bp.get("/candidate/social/<int:id>")
+def get_social_media(id):
+    social_links = social_media.get_social_media(id)
+    if not social_links:
+        return jsonify({"error": "Sentiment not found"}), 404
+    return jsonify ({"socials": social_links}), 200
