@@ -96,27 +96,6 @@ def extract_candidate_info(name: str):
             "educacion": {"type": "string"},
             "summary": {"type": "string"},
             "ref": {"type": "array", "items": {"type": "string"}}
-            # ,
-            # "controversies": {
-            #     "type": "array",
-            #     "items": {
-            #         "type": "object",
-            #         "properties": {
-            #             "summary": {"type": "string"},
-            #             "ref": {"type": "array", "items": {"type": "string"}}
-            #         }
-            #     }
-            # },
-            # "accomplishments": {
-            #     "type": "array",
-            #     "items": {
-            #         "type": "object",
-            #         "properties": {
-            #             "summary": {"type": "string"},
-            #             "ref": {"type": "array", "items": {"type": "string"}}
-            #         }
-            #     }
-            # }
         },
         "required": ["age","educacion", "summary", "ref"]
     }
