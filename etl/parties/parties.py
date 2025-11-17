@@ -384,7 +384,7 @@ def get_links(person):
     }
 
 
-    query = f'"{person}" partido politico peru'
+    query = f'"{person}" candidato presidencial peru'
 
     payload = {
             "q": query,
@@ -410,7 +410,9 @@ def fetch_text_from_url(url):
         print(f"Error fetching {url}: {e}")
     return None
 
-def main():
+
+
+def get_parties_information():
     _, parties_names = get_parties_table()
     results = []
     for i in parties_names:
@@ -433,6 +435,9 @@ def main():
         insert_into_table(i,result)
 
 
-if __name__ == "__main__":
-    main()
+def main():
+    get_parties_information()
 
+
+if __name__ == "__main__":
+    print(get_links('Roberto Chiabra'))
