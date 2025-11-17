@@ -7,50 +7,57 @@ import requests
 import re
 from urllib.parse import urlparse
 load_dotenv()
+from google.cloud import storage
 TWITTER_API_KEY = os.environ.get("TWITTER_API")
 SERPER_API_KEY = os.environ.get("SERPER")
-def download_twitter_image(image_url, filename):
-    if image_url is None:
-        return
+GOOGLE_CREDENTIALS = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
 
-
-    # Full path INCLUDING the output filename
-    save_path = r"C:\Users\Emilio GR\Downloads\cand_img" + "\\" + filename
-
-    img_data = requests.get(image_url).content
-    with open(save_path, "wb") as f:
-        f.write(img_data)
-
-    print("Saved:", save_path)
-
-
-
-def download_web_image(url, filename):
-    if url is None:
-        return
-
-    save_path = r"C:\Users\Emilio GR\Downloads\cand_img" + "\\" + filename
-    
+def upload_image_to_gcs(url, bucket_name, destination_blob_name):
+    # 1. Download the image bytes (in memory)
     headers = {
         "User-Agent": (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/120.0.0.0 Safari/537.36"
+            "Chrome/124.0.0.0 Safari/537.36"
         )
     }
-
     try:
-        r = requests.get(url, headers=headers, timeout=10)
-        r.raise_for_status()
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        image_bytes = response.content
 
-        with open(save_path, "wb") as f:
-            f.write(r.content)
+        # 2. Upload directly to Google Cloud Storage
+        storage_client = storage.Client()
+        bucket = storage_client.bucket(bucket_name)
+        blob = bucket.blob(destination_blob_name)
 
-        return True
+        blob.upload_from_string(image_bytes, content_type="image/jpeg")
 
+        print(f"Uploaded {destination_blob_name} to gs://{bucket_name}/")
     except Exception as e:
-        print(f"Skipping image {url} — {e}")
-        return False
+        return
+    
+
+
+def upload_twitter_image_to_gcs(twitter_img_url, bucket_name, destination_blob_name):
+    # Download image bytes from Twitter CDN
+    response = requests.get(twitter_img_url, timeout=10)
+    response.raise_for_status()
+
+    image_bytes = response.content
+
+    # Upload to GCS
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(bucket_name)
+    blob = bucket.blob(destination_blob_name)
+
+
+    blob.upload_from_string(image_bytes, content_type="image/jpeg")
+
+    print(f"Uploaded Twitter image → gs://{bucket_name}/{destination_blob_name}")
+    
+
+
 
 def upgrade_twitter_image_quality(url: str) -> str:
     if "name=" in url:
@@ -109,7 +116,7 @@ def get_candidate_image_url(person_name: str) -> str | None:
 
     url = "https://google.serper.dev/images"
 
-    query = f"{person_name} candidato Peru"
+    query = f"{person_name} partido Peru"
     payload = {
         "q": query
     }
@@ -141,8 +148,6 @@ def get_candidate_image_url(person_name: str) -> str | None:
     except Exception as e:
         print("Error:", e)
         return None
-
-
 
 def get_candidates_id():
     # get canditate name and ID
@@ -189,7 +194,35 @@ def get_candiate_twitter(id):
         conn.close()
         return twitter
     except Exception as e:
-        print("Error inserting party:", e)
+        print("Error ", e)
+        if conn:
+            conn.rollback()
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+        return None
+
+def get_parties_id():
+    # get canditate name and ID
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        print("DATABASE_URL not found in environment")
+        return None
+    try:
+        # Connect to the DB
+        conn = psycopg2.connect(database_url)
+        cur = conn.cursor()
+        query = sql.SQL(f"SELECT id, name FROM candidate_data.parties")
+        cur.execute(query)
+
+        candidates = cur.fetchall()
+        print(candidates)
+        cur.close()
+        conn.close()
+        return candidates
+    except Exception as e:
+        print("Error ", e)
         if conn:
             conn.rollback()
         if cur:
@@ -200,21 +233,29 @@ def get_candiate_twitter(id):
 
 def main():
     candidates = get_candidates_id()
+    bucket_name= "images_candidate_tracker_candidates"
     for id, candidate in candidates:
         if candidate == "Pendiente":
             continue
         candidate_twitter = get_candiate_twitter(id)
-        candidate+=".jpg"
+        
+ 
         if candidate_twitter is None:
             img_url = get_candidate_image_url(candidate)
-            download_web_image(img_url, candidate)
+            upload_image_to_gcs(img_url,bucket_name, str(id) )
         else:
             img_url = get_twitter_profile_image(candidate_twitter)
             if img_url is None:
                 continue
             img_url = upgrade_twitter_image_quality(img_url)
-            download_twitter_image(img_url, candidate)
-
+            upload_twitter_image_to_gcs(img_url,bucket_name,str(id))
+         
+def get_parties_img():
+    parties =  get_parties_id()
+    bucket_name= "images_candidate_tracker_parties"
+    for id, partie in parties:
+        img_url = get_candidate_image_url(partie)
+        upload_image_to_gcs(img_url, bucket_name, str(id))
 
 if __name__ == "__main__":
-    main()
+    get_parties_img()
