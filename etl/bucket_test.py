@@ -12,7 +12,8 @@ def upload_image(bucket_name,source_file_name,blob_name):
     blob.upload_from_filename(source_file_name)
 
 
-upload_image('images_candidate_tracker_candidates','/Users/carlalopez/Candidate-Tracker-Peru/etl/Perú.jpg','image_peru')
 
-
+for file in files: 
+    name = file.strip(".")[0]
+    upload_image('images_candidate_tracker_candidates',file,name)
 
