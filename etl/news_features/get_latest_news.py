@@ -8,7 +8,8 @@ import json
 from psycopg2 import sql
 from datetime import datetime
 from unidecode import unidecode
-
+from datetime import time
+from src.services.data_management import news
 
 
 NEWS_API = os.environ.get("CARLA_API")
@@ -236,4 +237,15 @@ def get_candidate_news(batch_time):
             conn.close()
 
 
-get_candidate_news("evening")
+def get_day_period(t: time) -> str:
+    """Return 'morning' if before 12 PM, otherwise 'evening'."""
+    return "morning" if t.hour < 12 else "evening"
+
+def main():
+    batch_time = get_day_period(datetime.now().time())
+    get_candidate_news(batch_time)
+    news.store_candidates_news(batch_time)
+    
+
+if __name__ == "__main__":
+    main()

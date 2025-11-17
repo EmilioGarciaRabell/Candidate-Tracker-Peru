@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from src.services.data_management import news
-from etl.get_latest_news import call_api_store_initial_news
+from etl.news_features.get_latest_news import call_api_store_initial_news
 
 news_bp = Blueprint('page_bp', __name__)
 
