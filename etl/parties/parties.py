@@ -14,7 +14,7 @@ import os
 from serpapi import GoogleSearch
 import trafilatura
 import unicodedata
-
+import wikipedia
 
 
 # --- Setup ---
@@ -50,7 +50,7 @@ def get_parties(html):
 
     return list_candidates
 
-import wikipedia
+
 
 def insert_into_table(party_dict):
     database_url = os.environ.get("DATABASE_URL")
