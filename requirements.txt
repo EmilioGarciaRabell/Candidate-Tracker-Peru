@@ -10,3 +10,4 @@ psycopg2
 apscheduler
 google-search-results
 Wikipedia-API
+google-cloud-storage
