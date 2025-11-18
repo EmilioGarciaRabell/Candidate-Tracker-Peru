@@ -133,13 +133,6 @@ def get_parties_table():
             SELECT id, name FROM candidate_data.parties
             ORDER BY name ASC
         """)
-    #     cur.execute("""
-    #     SELECT id, name 
-    #     FROM candidate_data.parties 
-    #     WHERE summary = %s
-    #     ORDER BY name ASC
-    # """, ('not found',))  # <-- trailing comma makes it a tuple
-
         parties = cur.fetchall()
         conn.close()
 
@@ -384,7 +377,7 @@ def get_links(person):
     }
 
 
-    query = f'"{person}" candidato presidencial peru'
+    query = f'"{person}" candidato presidencial peru biografia'
 
     payload = {
             "q": query,
@@ -440,4 +433,5 @@ def main():
 
 
 if __name__ == "__main__":
-    print(get_links('Roberto Chiabra'))
+    print(get_links('Mesías Guevara'))
+
