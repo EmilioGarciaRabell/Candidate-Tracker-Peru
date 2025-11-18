@@ -3,13 +3,34 @@
 import { Candidate } from "@/interfaces/CandidateInterface";
 import s from "./userCard.module.css";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-// ⬇️ Update this path if your profile.jpg is elsewhere
 import profilePicture from "./profile.jpg";
+import { useEffect, useState } from "react";
 
 export default function UserCard({ name, party, age, id }: Candidate) {
   const router = useRouter();
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageFailed, setImageFailed] = useState(false);
+  const safeImageSrc = imageFailed || !imageUrl ? profilePicture.src : imageUrl;
 
+
+
+
+  useEffect(() => {
+  const fetch_images = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/image/${id}`, { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed image request");
+
+      const data = await res.json();
+      setImageUrl(data.url);
+    } catch (e) {
+      setImageFailed(true);
+    }
+  };
+
+  fetch_images();
+}, [id]);
   return (
     <article
       className={s.card}
@@ -23,14 +44,16 @@ export default function UserCard({ name, party, age, id }: Candidate) {
       {/* Avatar */}
       <div className={s.avatarWrap} aria-hidden="true">
         <div className={s.avatarRing}>
-          <Image
-            src={profilePicture}
-            alt=""
+          <img
+            src={safeImageSrc}
+            onError={() => setImageFailed(true)}
+            alt={`${name} profile image`}
             className={s.avatarImg}
             width={72}
             height={72}
-            priority
           />
+
+
         </div>
       </div>
 

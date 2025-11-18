@@ -80,6 +80,11 @@ export default function CandidatePage() {
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageFailed, setImageFailed] = useState(false);
+  const safeImageSrc = imageFailed || !imageUrl ? profilePicture.src : imageUrl;
+
+
   // Fetch Candidate (unchanged)
   useEffect(() => {
     if (!id) {
@@ -102,37 +107,52 @@ export default function CandidatePage() {
     return () => { cancelled = true; };
   }, [id, apiUrl]);
 
+  useEffect(() => {
+    const fetch_images = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/image/${id}`, { cache: "no-store" });
+        if (!res.ok) throw new Error("Failed image request");
+
+        const data = await res.json();
+        setImageUrl(data.url);
+      } catch (e) {
+        setImageFailed(true);
+      }
+  };
+
+  fetch_images();
+}, [id]);
+
   // Fetch Socials only when “redes” is opened first time (NEW)
-useEffect(() => {
-  if (!id || activeTab !== "redes") return;
-  if (socialsFetchedRef.current) return; // fetch only once per candidate
+  useEffect(() => {
+    if (!id || activeTab !== "redes") return;
+    if (socialsFetchedRef.current) return; // fetch only once per candidate
 
-  socialsFetchedRef.current = true;      // lock before starting request
-  setSocialLoading(true);
-  setSocialError(null);
+    socialsFetchedRef.current = true;      // lock before starting request
+    setSocialLoading(true);
+    setSocialError(null);
 
-  let cancelled = false;
+    let cancelled = false;
 
-  (async () => {
-    try {
-      const res = await fetch(`${apiUrl}/candidate/social/${id}`, { cache: "no-store" });
-      if (!res.ok) throw new Error(`Error ${res.status}`);
-      const payload = await res.json();
+    (async () => {
+      try {
+        const res = await fetch(`${apiUrl}/candidate/social/${id}`, { cache: "no-store" });
+        if (!res.ok) throw new Error(`Error ${res.status}`);
+        const payload = await res.json();
 
-      // shape: { socials: { candidate_id, facebook, instagram, twitter, ... } }
-      const obj = payload?.socials;
-      const arr = normalizeToArray(obj); // your existing helper
+        // shape: { socials: { candidate_id, facebook, instagram, twitter, ... } }
+        const obj = payload?.socials;
+        const arr = normalizeToArray(obj); // your existing helper
 
-      if (!cancelled) setSocials(arr);
-    } catch (err: any) {
-      if (!cancelled) setSocialError(err?.message || "No se pudieron cargar las redes.");
-    } finally {
-      if (!cancelled) setSocialLoading(false);
-    }
+        if (!cancelled) setSocials(arr);
+      } catch (err: any) {
+        if (!cancelled) setSocialError(err?.message || "No se pudieron cargar las redes.");
+      } finally {
+        if (!cancelled) setSocialLoading(false);
+      }
   })();
 
   return () => { cancelled = true; };
-  // 🚫 IMPORTANT: do NOT include socialLoading/socials/socialError here
 }, [activeTab, id, apiUrl]);
 
   const tabs = [
@@ -205,13 +225,13 @@ useEffect(() => {
             <div className={`${styles.cardSoft} card ${styles.stickyAside}`}>
               <div className="card-image">
                 <figure className={`image is-square ${styles.imageWrapper}`}>
-                  <Image
-                    src={profilePicture}
-                    alt={candidate.name}
-                    width={500}
-                    height={500}
+                  <img
+                    src={safeImageSrc}
+                    onError={() => setImageFailed(true)}
+                    alt={`${name} profile image`}
                     className={styles.profileImage}
-                    priority
+                    width={72}
+                    height={72}
                   />
                 </figure>
               </div>

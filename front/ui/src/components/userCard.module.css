@@ -57,6 +57,7 @@
   background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
   display: grid;
   place-items: center;
+  overflow: hidden;
   box-shadow: 0 6px 16px rgba(125, 204, 255, 0.28);
 }
 
@@ -66,9 +67,10 @@
   border-radius: 50%;
   display: block;
   object-fit: cover;
-  border: 2px solid #ffffff;
   background: #fff;
 }
+
+
 
 /* Header */
 .header {
@@ -173,3 +175,5 @@
     font-size: 1rem;
   }
 }
+
+
