@@ -1,7 +1,18 @@
 @import "tailwindcss";
+@import "bulma/css/bulma.css";
+
 
 :root {
   --background: #ffffff;
+}
+html, body {
+  background: #ffffff !important;
+  color: #222 !important;
+}
+
+.box, .card {
+  background: #ffffff !important;
+  color: #222 !important;
 }
 
 @theme inline {
@@ -38,6 +49,55 @@ hr {
 }
 
 
+/* Clean minimalistic overrides */
+body {
+  background: #f5f6fa !important;
+  color: #1a1a1a !important;
+}
+
+/* Card styling */
+.card {
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  background: white;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+/* Section titles */
+.title,
+.subtitle {
+  color: #222 !important;
+  font-weight: 700;
+}
+
+/* Light small section text */
+.has-text-grey {
+  color: #555 !important;
+}
+
+/* Make navbar minimal */
+.navbar {
+  box-shadow: none !important;
+  border-bottom: 1px solid #e2e2e2 !important;
+  padding: 0.5rem 1rem !important;
+}
+
+.navbar-item,
+.navbar-link {
+  color: #222 !important;
+  font-weight: 500;
+}
+
+/* Progress bar colors */
+.progress.is-negative {
+  background-color: #ff6b6b !important;
+}
+.progress.is-neutral {
+  background-color: #f4c542 !important;
+}
+.progress.is-positive {
+  background-color: #4cd964 !important;
+}
 
 
 .header{

@@ -1,42 +1,87 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import styles from "./home.module.css"; 
+import styles from "./home.module.css";
 
 export default function Home() {
   return (
-    <section className={styles.background}>
-      <div className={styles.padding}>
+    <>
+      {/* Skip link for keyboard users */}
+      <a href="#main" className={styles.skipLink}>Saltar al contenido</a>
 
-        <div className={styles.home}>
+      <section
+        aria-labelledby="home-title"
+        className={styles.background}
+        role="region"
+      >
+        <div className={styles.shell}>
+          <div className={styles.hero}>
+            {/* Copy */}
+            <header className={styles.copy}>
+              <p className={styles.kicker}>
+                Por un Perú informado rumbo a las elecciones 2026
+              </p>
 
-          <div>
+              <h1 id="home-title" className={styles.title}>
+                Infórmate por un <span className={styles.titleAccent}>Perú mejor</span>
+              </h1>
 
-            <h1 className="text-base font-semibold tracking-wider text-blue-600 uppercase"> Por un Peru informado en miras a las elecciones 2026</h1>
+              <p className={styles.subtitle}>
+                Descubre candidatos, propuestas y opinión pública en un sólo lugar.
+                Datos claros, diseño ligero y accesible — para decidir mejor.
+              </p>
 
-            <p className="mt-4 text-4xl font-bold text-black lg:mt-8 sm:text-6xl xl:text-8xl">Informate por un Peru mejor</p>
-
-              <Link href="/candidates">
-                <button className="customButton mt-10">
+              <div className={styles.ctaRow} id="main">
+                <Link href="/candidates" className={styles.ctaPrimary} aria-label="Ir a lista de candidatos">
                   Infórmate ahora
-                </button>
-              </Link>
+                </Link>
+                <Link href="/dashboard" className={styles.ctaGhost} aria-label="Ver tendencias y panel de datos">
+                  Ver tendencias
+                </Link>
+              </div>
 
+              {/* Tiny trust row */}
+              <ul className={styles.badges} role="list" aria-label="Aspectos destacados">
+                <li className={styles.badge}>Actualizado</li>
+                <li className={styles.badge}>Transparente</li>
+                <li className={styles.badge}>Accesible</li>
+              </ul>
+            </header>
+
+            {/* Illustration */}
+            <div className={styles.imageWrap} aria-hidden="true">
+              <div className={styles.imageCard}>
+                <Image
+                  src="/landing.svg"
+                  alt=""
+                  width={960}
+                  height={720}
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className={styles.heroImg}
+                />
+              </div>
+            </div>
           </div>
 
-          <div className={styles.imageSection}>
-            <Image
-              src="/landing.svg"
-              alt="imagen del landing page"
-              width={100}
-              height={100}
-              className="w-full rounded-4xl"
-            />
-          </div>
-
+          {/* Quick links section (optional, simple and airy) */}
+          <nav className={styles.quickLinks} aria-label="Accesos directos">
+            <Link href="/candidates" className={styles.qLink}>
+              Candidatos
+              <span aria-hidden="true" className={styles.arrow}>→</span>
+            </Link>
+            <Link href="/noticias" className={styles.qLink}>
+              Noticias
+              <span aria-hidden="true" className={styles.arrow}>→</span>
+            </Link>
+            <Link href="/dashboard" className={styles.qLink}>
+              Tendencias
+              <span aria-hidden="true" className={styles.arrow}>→</span>
+            </Link>
+          </nav>
         </div>
-          
-
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
