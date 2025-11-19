@@ -97,12 +97,14 @@ export default function CandidatePage() {
         if (!res.ok) throw new Error("Fetch failed");
         const data = await res.json();
         if (!cancelled) setCandidate(data.candidate ?? null);
+        console.log(data)
       } catch {
         if (!cancelled) setCandidate(null);
       } finally {
         if (!cancelled) setLoading(false);
       }
     })();
+    
     return () => { cancelled = true; };
   }, [id, apiUrl]);
 
@@ -161,28 +163,10 @@ export default function CandidatePage() {
     ["propuestas", "Propuestas"],
     ["polemicas", "Polemicas"],
     ["opinionPublica", "Opinión Pública"],
-    ["redes", "Redes Sociales"],
+    // ["redes", "Redes Sociales"],
     ["referencias","Referencias"]
   ] as const;
 
-  function flattenRefs(refsObj: any) {
-  if (!refsObj) return [];
-
-  const out: { category: string; quote: string; link: string }[] = [];
-
-  for (const [category, entries] of Object.entries(refsObj)) {
-    if (Array.isArray(entries)) {
-      for (const ref of entries) {
-        out.push({
-          category,
-          quote: ref.quote ?? "",
-          link: ref.link ?? "",
-        });
-      }
-    }
-  }
-  return out;
-}
 
   if (loading) {
     return (
@@ -259,12 +243,66 @@ export default function CandidatePage() {
               </div>
 
               <div className="card-content">
-                <p className="title is-6 mb-3">Experiencia Laboral</p>
-                {candidate.summary ? (
-                  <p className="is-size-7 has-text-grey">{candidate.summary}</p>
-                ) : (
-                  <p className="is-size-7 has-text-grey-light">No se ha proporcionado experiencia laboral.</p>
-                )}
+                <p className="title is-6 mb-3">Redes Sociales</p>
+                  <div className={styles.subtleDivider} />
+
+                  {socialLoading && (
+                    <ul className={styles.socialGrid} role="list" aria-busy="true">
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <li key={i} className={styles.socialSkeleton} />
+                      ))}
+                    </ul>
+                  )}
+
+                  {!socialLoading && socialError && (
+                    <div className="notification is-danger is-light">
+                      <p className="mb-2"><strong>Ocurrió un problema:</strong> {socialError}</p>
+                      <button
+                        className="button is-danger is-light is-small mt-2"
+                        onClick={() => {
+                          setSocials([]);
+                          setSocialError(null);
+                          setActiveTab("redes"); // retrigger fetch
+                        }}
+                      >
+                        Reintentar
+                      </button>
+                    </div>
+                  )}
+
+                  {!socialLoading && !socialError && socials.length === 0 && (
+                    <p className="has-text-grey">No hay redes sociales registradas.</p>
+                  )}
+
+                  {!socialLoading && !socialError && socials.length > 0 && (
+                    <ul className={styles.socialGrid} role="list">
+                      {socials.map((s, idx) => (
+                        <li key={`${s.platform}-${idx}`}>
+                          <a
+                            className={styles.socialLink}
+                            href={s.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`${s.platform} ${s.handle || ""}`.trim()}
+                          >
+                            <span className={styles.iconWrap} aria-hidden="true">
+                              <PlatformIcon platform={s.platform} />
+                            </span>
+                            <span className={styles.socialText}>
+                              <span className={styles.socialHandle}>
+                                {s.handle || prettifyPlatform(s.platform)}
+                              </span>
+                              <span className={styles.socialUrl}>{new URL(s.url).hostname}</span>
+                            </span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                
+                
+
+
               </div>
             </div>
           </aside>
@@ -310,7 +348,7 @@ export default function CandidatePage() {
                 <>
                   <h3 className="title is-5">Experiencia Laboral</h3>
                 <div className={styles.subtleDivider} />
-                  <p className="has-text-grey">{candidate.experienciaLaboral ?? "No hay informacion disponible"}</p>
+                  <p className="has-text-grey">{candidate.work_experience ?? "No hay informacion disponible"}</p>
                 </>
               )}
 
@@ -339,7 +377,7 @@ export default function CandidatePage() {
               )}
 
 
-              {activeTab === "redes" && (
+              {/* {activeTab === "redes" && (
                 <>
                   <h3 className="title is-5">Redes Sociales</h3>
                   <div className={styles.subtleDivider} />
@@ -398,21 +436,19 @@ export default function CandidatePage() {
                     </ul>
                   )}
                 </>
-              )}
+              )} */}
 
               {activeTab === "referencias" && (
                 <>
                   <h3 className="title is-5">Referencias</h3>
                   <div className={styles.subtleDivider} />
 
-              {!candidate.ref || Object.keys(candidate.ref).length === 0 ? (
+              {!candidate.ref || candidate.ref.length === 0 ? (
                 <p className="has-text-grey">No hay referencias registradas.</p>
               ) : (
                 <div className={styles.refsGrid}>
-                  {flattenRefs(candidate.ref).map((ref, i) => (
+                  {candidate.ref?.map((ref, i) => (
                     <div key={i} className={styles.refCard}>
-                      <span className={styles.refCategory}>{ref.category}</span>
-
                       <blockquote className={styles.refQuote}>
                         “{ref.quote}”
                       </blockquote>
