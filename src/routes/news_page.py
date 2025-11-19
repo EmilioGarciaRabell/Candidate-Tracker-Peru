@@ -25,8 +25,7 @@ def get_candidate_news(batch):
     n = news.get_news(batch)
     if not n:
         return jsonify({"news": []})
-    return jsonify(n[0]["news_json"])  # ✅ send plain JSON
-
+    return jsonify(n[0]["news_json"])
     
 
 
