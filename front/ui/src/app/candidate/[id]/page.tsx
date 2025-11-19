@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
-import Image from "next/image";
 import { Candidate } from "@/interfaces/CandidateInterface";
 import PublicOpinionSection from "./PublicOpinionSection";
 import profilePicture from "./profile.jpg";
@@ -70,7 +69,7 @@ export default function CandidatePage() {
   const [loading, setLoading] = useState(true);
   const socialsFetchedRef = useRef(false)
   const [activeTab, setActiveTab] = useState<
-    "historia" | "antecedentes" | "opinionPublica" | "propuestas" | "redes"
+    "historia" | "educacion" | "experienciaLaboral" | "polemicas" |  "propuestas" |"opinionPublica" | "redes" | "referencias" 
   >("historia");
 
   // socials state (NEW)
@@ -157,11 +156,33 @@ export default function CandidatePage() {
 
   const tabs = [
     ["historia", "Historia"],
-    ["antecedentes", "Antecedentes"],
-    ["opinionPublica", "Opinión Pública"],
+    ["educacion", "Educacion"],
+    ["experienciaLaboral", "Experencia Laboral"],
     ["propuestas", "Propuestas"],
+    ["polemicas", "Polemicas"],
+    ["opinionPublica", "Opinión Pública"],
     ["redes", "Redes Sociales"],
+    ["referencias","Referencias"]
   ] as const;
+
+  function flattenRefs(refsObj: any) {
+  if (!refsObj) return [];
+
+  const out: { category: string; quote: string; link: string }[] = [];
+
+  for (const [category, entries] of Object.entries(refsObj)) {
+    if (Array.isArray(entries)) {
+      for (const ref of entries) {
+        out.push({
+          category,
+          quote: ref.quote ?? "",
+          link: ref.link ?? "",
+        });
+      }
+    }
+  }
+  return out;
+}
 
   if (loading) {
     return (
@@ -204,6 +225,7 @@ export default function CandidatePage() {
             <nav className="breadcrumb is-small mb-2" aria-label="breadcrumbs">
               <ul>
                 <li><a href="/">Inicio</a></li>
+                <li><a href="/candidates">Candidatos</a></li>
                 <li className="is-active"><a aria-current="page">Candidato</a></li>
               </ul>
             </nav>
@@ -276,11 +298,27 @@ export default function CandidatePage() {
                 </>
               )}
 
-              {activeTab === "antecedentes" && (
+              {activeTab === "educacion" && (
+                <>
+                  <h3 className="title is-5">Educacion</h3>
+                <div className={styles.subtleDivider} />
+                  <p className="has-text-grey">{candidate.education ?? "No hay informacion disponible"}</p>
+                </>
+              )}
+
+              {activeTab === "experienciaLaboral" && (
+                <>
+                  <h3 className="title is-5">Experiencia Laboral</h3>
+                <div className={styles.subtleDivider} />
+                  <p className="has-text-grey">{candidate.experienciaLaboral ?? "No hay informacion disponible"}</p>
+                </>
+              )}
+
+              {activeTab === "polemicas" && (
                 <>
                   <h3 className="title is-5">Antecedentes</h3>
                   <div className={styles.subtleDivider} />
-                  <p className="has-text-grey">No hay antecedentes registrados.</p>
+                  <p className="has-text-grey">{candidate.polemicas ?? "No hay informacion disponible"}</p>
                 </>
               )}
 
@@ -299,6 +337,7 @@ export default function CandidatePage() {
                   <p className="has-text-grey">No se han registrado propuestas.</p>
                 </>
               )}
+
 
               {activeTab === "redes" && (
                 <>
@@ -360,6 +399,38 @@ export default function CandidatePage() {
                   )}
                 </>
               )}
+
+              {activeTab === "referencias" && (
+                <>
+                  <h3 className="title is-5">Referencias</h3>
+                  <div className={styles.subtleDivider} />
+
+              {!candidate.ref || Object.keys(candidate.ref).length === 0 ? (
+                <p className="has-text-grey">No hay referencias registradas.</p>
+              ) : (
+                <div className={styles.refsGrid}>
+                  {flattenRefs(candidate.ref).map((ref, i) => (
+                    <div key={i} className={styles.refCard}>
+                      <span className={styles.refCategory}>{ref.category}</span>
+
+                      <blockquote className={styles.refQuote}>
+                        “{ref.quote}”
+                      </blockquote>
+
+                      <a
+                        className={styles.refLink}
+                        href={ref.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Ver fuente →
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
             </div>
           </div>
         </div>

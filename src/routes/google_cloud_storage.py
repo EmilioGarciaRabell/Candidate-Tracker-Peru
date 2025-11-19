@@ -17,10 +17,10 @@ def get_image_url(filename):
 
     return jsonify({"url": url})
 
-@google_storage_bp.get("/image/<int:filename>")
+@google_storage_bp.get("/pImage/<int:filename>")
 def get_parties_url(filename):
     client = storage.Client()
-    bucket = client.bucket("images_parties_tracker_candidates")
+    bucket = client.bucket("images_candidate_tracker_parties")
     blob = bucket.blob(str(filename))
     url = blob.generate_signed_url(
         version="v4",

@@ -5,8 +5,9 @@ import s from "./userCard.module.css";
 import { useRouter } from "next/navigation";
 import profilePicture from "./profile.jpg";
 import { useEffect, useState } from "react";
+import { Party } from "@/interfaces/Party";
 
-export default function UserCard({ name, party, age, id }: Candidate) {
+export default function UserCard({ name, position,id }: Party) {
   const router = useRouter();
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -17,7 +18,7 @@ export default function UserCard({ name, party, age, id }: Candidate) {
   useEffect(() => {
   const fetch_images = async () => {
     try {
-      const res = await fetch(`${apiUrl}/image/${id}`, { cache: "no-store" });
+      const res = await fetch(`${apiUrl}/pImage/${id}`, { cache: "no-store" });
       if (!res.ok) throw new Error("Failed image request");
 
       const data = await res.json();
@@ -29,14 +30,16 @@ export default function UserCard({ name, party, age, id }: Candidate) {
 
   fetch_images();
 }, [id]);
+
+
   return (
     <article
       className={s.card}
       role="button"
       tabIndex={0}
-      onClick={() => router.push(`/candidate/${id}`)}
+      onClick={() => router.push(`/partido/${id}`)}
       onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") router.push(`/candidate/${id}`);
+        if (e.key === "Enter" || e.key === " ") router.push(`/partido/${id}`);
       }}
     >
       {/* Avatar */}
@@ -59,11 +62,11 @@ export default function UserCard({ name, party, age, id }: Candidate) {
       <header className={s.header}>
         <h2 className={s.name} title={name}>{name}</h2>
         <div className={s.metaRow}>
-          <span className={s.chip}>
+          {/* <span className={s.chip}>
             {party ? `Partido ${party}` : "Sin partido"}
-          </span>
+          </span> */}
           <span className={s.dot} />
-          <span className={s.metaText}>{age ?? "—"} años</span>
+          {/* <span className={s.metaText}>{position ?? "—"} Ideologia</span> */}
         </div>
       </header>
 
@@ -73,7 +76,7 @@ export default function UserCard({ name, party, age, id }: Candidate) {
           className={s.linkButton}
           onClick={(e) => {
             e.stopPropagation();
-            router.push(`/candidate/${id}`);
+            router.push(`/partido/${id}`);
           }}
         >
           Más info
