@@ -1,5 +1,8 @@
 export interface Party{
-    name:String,
-    political_spectrum:String,
-    summary:String
+    id: number,
+    name:string,
+    position:string,
+    summary:string,
+    ref: string,
+    image: string
 }

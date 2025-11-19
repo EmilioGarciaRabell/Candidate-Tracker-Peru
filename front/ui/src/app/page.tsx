@@ -7,9 +7,7 @@ import styles from "./home.module.css";
 export default function Home() {
   return (
     <>
-      {/* Skip link for keyboard users */}
-      <a href="#main" className={styles.skipLink}>Saltar al contenido</a>
-
+    
       <section
         aria-labelledby="home-title"
         className={styles.background}

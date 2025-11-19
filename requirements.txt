@@ -7,3 +7,4 @@ Flask-Cors
 python-dotenv
 gunicorn # For production purposes
 psycopg2
+google-cloud-storage
