@@ -60,6 +60,13 @@ function normalizeToArray(obj: SocialsApi | null | undefined): SocialLink[] {
   return out;
 }
 
+
+function safeHostname(url: string) {
+  try { return new URL(url).hostname; }
+  catch { return url; }
+}
+
+
 /* ===== Page Component ===== */
 export default function CandidatePage() {
   const params = useParams();
@@ -97,7 +104,7 @@ export default function CandidatePage() {
         if (!res.ok) throw new Error("Fetch failed");
         const data = await res.json();
         if (!cancelled) setCandidate(data.candidate ?? null);
-        console.log(data)
+        
       } catch {
         if (!cancelled) setCandidate(null);
       } finally {
@@ -125,36 +132,37 @@ export default function CandidatePage() {
 }, [id]);
 
   // Fetch Socials only when “redes” is opened first time (NEW)
-  useEffect(() => {
-    if (!id || activeTab !== "redes") return;
-    if (socialsFetchedRef.current) return; // fetch only once per candidate
+ useEffect(() => {
+  if (!id) return;
+  if (socialsFetchedRef.current) return;
 
-    socialsFetchedRef.current = true;      // lock before starting request
-    setSocialLoading(true);
-    setSocialError(null);
+  socialsFetchedRef.current = true;
 
-    let cancelled = false;
+  setSocialLoading(true);
+  setSocialError(null);
 
-    (async () => {
-      try {
-        const res = await fetch(`${apiUrl}/candidate/social/${id}`, { cache: "no-store" });
-        if (!res.ok) throw new Error(`Error ${res.status}`);
-        const payload = await res.json();
+  let cancelled = false;
 
-        // shape: { socials: { candidate_id, facebook, instagram, twitter, ... } }
-        const obj = payload?.socials;
-        const arr = normalizeToArray(obj); // your existing helper
+  (async () => {
+    try {
+      const res = await fetch(`${apiUrl}/candidate/social/${id}`, { cache: "no-store" });
+      if (!res.ok) throw new Error(`Error ${res.status}`);
 
-        if (!cancelled) setSocials(arr);
-      } catch (err: any) {
-        if (!cancelled) setSocialError(err?.message || "No se pudieron cargar las redes.");
-      } finally {
-        if (!cancelled) setSocialLoading(false);
-      }
+      const payload = await res.json();
+      const arr = normalizeToArray(payload?.socials);
+
+      if (!cancelled) setSocials(arr);
+
+    } catch (err: any) {
+      if (!cancelled) setSocialError(err.message);
+    } finally {
+      if (!cancelled) setSocialLoading(false);
+    }
   })();
 
   return () => { cancelled = true; };
-}, [activeTab, id, apiUrl]);
+}, [id, apiUrl]);
+
 
   const tabs = [
     ["historia", "Historia"],
@@ -292,7 +300,7 @@ export default function CandidatePage() {
                               <span className={styles.socialHandle}>
                                 {s.handle || prettifyPlatform(s.platform)}
                               </span>
-                              <span className={styles.socialUrl}>{new URL(s.url).hostname}</span>
+                              <span className={styles.socialUrl}>{safeHostname(s.url)}</span>
                             </span>
                           </a>
                         </li>
@@ -376,67 +384,6 @@ export default function CandidatePage() {
                 </>
               )}
 
-
-              {/* {activeTab === "redes" && (
-                <>
-                  <h3 className="title is-5">Redes Sociales</h3>
-                  <div className={styles.subtleDivider} />
-
-                  {socialLoading && (
-                    <ul className={styles.socialGrid} role="list" aria-busy="true">
-                      {Array.from({ length: 6 }).map((_, i) => (
-                        <li key={i} className={styles.socialSkeleton} />
-                      ))}
-                    </ul>
-                  )}
-
-                  {!socialLoading && socialError && (
-                    <div className="notification is-danger is-light">
-                      <p className="mb-2"><strong>Ocurrió un problema:</strong> {socialError}</p>
-                      <button
-                        className="button is-danger is-light is-small mt-2"
-                        onClick={() => {
-                          setSocials([]);
-                          setSocialError(null);
-                          setActiveTab("redes"); // retrigger fetch
-                        }}
-                      >
-                        Reintentar
-                      </button>
-                    </div>
-                  )}
-
-                  {!socialLoading && !socialError && socials.length === 0 && (
-                    <p className="has-text-grey">No hay redes sociales registradas.</p>
-                  )}
-
-                  {!socialLoading && !socialError && socials.length > 0 && (
-                    <ul className={styles.socialGrid} role="list">
-                      {socials.map((s, idx) => (
-                        <li key={`${s.platform}-${idx}`}>
-                          <a
-                            className={styles.socialLink}
-                            href={s.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label={`${s.platform} ${s.handle || ""}`.trim()}
-                          >
-                            <span className={styles.iconWrap} aria-hidden="true">
-                              <PlatformIcon platform={s.platform} />
-                            </span>
-                            <span className={styles.socialText}>
-                              <span className={styles.socialHandle}>
-                                {s.handle || prettifyPlatform(s.platform)}
-                              </span>
-                              <span className={styles.socialUrl}>{new URL(s.url).hostname}</span>
-                            </span>
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </>
-              )} */}
 
               {activeTab === "referencias" && (
                 <>
