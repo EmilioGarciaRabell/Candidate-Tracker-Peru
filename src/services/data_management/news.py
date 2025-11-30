@@ -75,7 +75,7 @@ def store_candidates_news(batch_time):
 def get_news(batch_time):
     conn = BATCH_TABLE._get_conn()
     sql = """
-    select news_json FROM candidate_data.news_batch WHERE batch = (%s) and date_time = CURRENT_DATE - 1
+    select news_json FROM candidate_data.news_batch WHERE batch = (%s) and date_time = CURRENT_DATE
     """
     try:
             with conn.cursor() as cur:
