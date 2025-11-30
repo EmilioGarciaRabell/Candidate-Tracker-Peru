@@ -16,7 +16,6 @@ SERPER_API_KEY = os.environ.get("SERPER")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=GEMINI_API_KEY)
 
-    
 
 def extract_candidate_category_info(text, candidate, category):
     if not text:
@@ -81,14 +80,13 @@ def extract_candidate_category_info(text, candidate, category):
     {text}
     """
 
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=prompt,
-        config={
-            "response_mime_type": "application/json",
-            "response_schema": schema
-        }
-    )
+    response = client.models.generate_content( 
+        model="gemini-3-pro-preview", 
+        contents=prompt, 
+        config={ "response_mime_type": "application/json", "response_schema": schema } )
+
+
+
 
     # If Gemini returns parsed structured output, prefer that
     result = getattr(response, "parsed", None)
@@ -181,7 +179,7 @@ def get_candidates_id():
         # Connect to the DB
         conn = psycopg2.connect(database_url)
         cur = conn.cursor()
-        query = sql.SQL(f"SELECT id, name FROM candidate_data.candidate_info")
+        query = sql.SQL(f"SELECT id, name FROM candidate_data.candidate_info ORDER BY id asc")
         cur.execute(query)
 
         candidates = cur.fetchall()
@@ -241,11 +239,10 @@ def process_candidate_category(candidate_id, candidate_name, category):
         
     # Call Gemini extraction
     extracted = extract_candidate_category_info(
-        extracted_sources,
-        candidate_name,
-        category
-    )
-
+    limited_sources,
+    candidate_name,
+    category
+)
     # Safety fallback
     if not extracted:
         extracted = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import UserCard from "@/components/UserCard";
 import { Candidate } from "@/interfaces/CandidateInterface";
 import s from "./candidates.module.css";
@@ -15,16 +15,29 @@ export default function Candidates() {
   const [query, setQuery] = useState("");
   const [partyFilter, setPartyFilter] = useState<string>("");
 
+  // image loading tracking
+  const [imagesDone, setImagesDone] = useState(0);
+  const [allImagesReady, setAllImagesReady] = useState(false);
+
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const fetchCandidates = async () => {
+    if (!apiUrl) {
+      setError("La URL de la API no está configurada (NEXT_PUBLIC_API_URL).");
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
       const res = await fetch(`${apiUrl}/candidates`, { cache: "no-store" });
       if (!res.ok) throw new Error(`Error ${res.status}`);
       const data = await res.json();
-      setCandidates(data.candidates ?? []);
+      const list = (data.candidates ?? []) as Candidate[];
+      const shuffled = shuffleArray<Candidate>(list);
+
+      setCandidates(shuffled);
     } catch (err: any) {
       setError(err?.message || "Error al cargar candidatos");
     } finally {
@@ -45,6 +58,7 @@ export default function Candidates() {
     return Array.from(set).sort();
   }, [candidates]);
 
+  // same filtered logic you already had
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return candidates.filter((c) => {
@@ -57,7 +71,39 @@ export default function Candidates() {
     });
   }, [candidates, query, partyFilter]);
 
-  // Loading skeleton
+  // whenever the list of cards changes, reset image counters
+  useEffect(() => {
+    if (filtered.length === 0) {
+      setImagesDone(0);
+      setAllImagesReady(true); // nothing to load
+    } else {
+      setImagesDone(0);
+      setAllImagesReady(false);
+    }
+  }, [filtered]);
+
+  // callback passed to each UserCard
+  const handleImageReady = useCallback(() => {
+    setImagesDone((prev) => {
+      const next = prev + 1;
+      if (next >= filtered.length) {
+        setAllImagesReady(true);
+      }
+      return next;
+    });
+  }, [filtered.length]);
+
+
+  function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array]; // avoid mutating original
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+  // Loading skeleton (data)
   if (loading) {
     return (
       <section className={`section ${s.pageBg}`}>
@@ -65,7 +111,9 @@ export default function Candidates() {
           <div className={`hero ${s.heroSoft}`}>
             <div className="hero-body py-5">
               <h1 className="title is-4 mb-1">Candidatos</h1>
-              <p className="subtitle is-6 has-text-grey">Cargando información…</p>
+              <p className="subtitle is-6 has-text-grey">
+                Cargando información…
+              </p>
             </div>
           </div>
 
@@ -85,9 +133,14 @@ export default function Candidates() {
       <section className="section">
         <div className="container">
           <div className="notification is-danger is-light">
-            <p className="mb-3"><strong>Ocurrió un problema</strong></p>
+            <p className="mb-3">
+              <strong>Ocurrió un problema</strong>
+            </p>
             <p className="mb-4">{error}</p>
-            <button className="button is-danger is-light" onClick={fetchCandidates}>
+            <button
+              className="button is-danger is-light"
+              onClick={fetchCandidates}
+            >
               Reintentar
             </button>
           </div>
@@ -105,7 +158,9 @@ export default function Candidates() {
             <div className={s.heroRow}>
               <div>
                 <h1 className="title is-3 mb-1">Candidatos</h1>
-                <p className="subtitle is-6 has-text-grey">Explora y filtra por nombre o partido.</p>
+                <p className="subtitle is-6 has-text-grey">
+                  Explora y filtra por nombre o partido.
+                </p>
               </div>
               <span className={`tag is-light ${s.countTag}`}>
                 {filtered.length} de {candidates.length}
@@ -158,6 +213,18 @@ export default function Candidates() {
           </div>
         </div>
 
+        {/* IMAGE LOADING OVERLAY (only after data is ready) */}
+        {!allImagesReady && filtered.length > 0 && (
+          <div className={s.imageLoadingOverlay}>
+            <div className={s.imageLoadingBox}>
+              <p className="title is-5 mb-1">Cargando imágenes…</p>
+              <p className="has-text-grey is-size-7">
+                {imagesDone} / {filtered.length}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* GRID */}
         {filtered.length === 0 ? (
           <div className="box has-text-centered">
@@ -179,7 +246,7 @@ export default function Candidates() {
           <ul className={s.grid} role="list">
             {filtered.map((c) => (
               <li key={c.id} className={s.gridItem} role="listitem">
-                <UserCard {...c} />
+                <UserCard {...c} onImageReady={handleImageReady} />
               </li>
             ))}
           </ul>

@@ -74,7 +74,7 @@ export default function CandidatePage() {
 
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [loading, setLoading] = useState(true);
-  const socialsFetchedRef = useRef(false)
+  
   const [activeTab, setActiveTab] = useState<
     "historia" | "educacion" | "experienciaLaboral" | "polemicas" |  "propuestas" |"opinionPublica" | "redes" | "referencias" 
   >("historia");
@@ -132,36 +132,44 @@ export default function CandidatePage() {
 }, [id]);
 
   // Fetch Socials only when “redes” is opened first time (NEW)
- useEffect(() => {
+ // Fetch Socials whenever we have an id
+useEffect(() => {
   if (!id) return;
-  if (socialsFetchedRef.current) return;
 
-  socialsFetchedRef.current = true;
+  let cancelled = false;
 
   setSocialLoading(true);
   setSocialError(null);
 
-  let cancelled = false;
-
   (async () => {
     try {
-      const res = await fetch(`${apiUrl}/candidate/social/${id}`, { cache: "no-store" });
+      const res = await fetch(`${apiUrl}/candidate/social/${id}`, {
+        cache: "no-store",
+      });
       if (!res.ok) throw new Error(`Error ${res.status}`);
 
       const payload = await res.json();
       const arr = normalizeToArray(payload?.socials);
 
-      if (!cancelled) setSocials(arr);
-
+      if (!cancelled) {
+        setSocials(arr);
+      }
     } catch (err: any) {
-      if (!cancelled) setSocialError(err.message);
+      if (!cancelled) {
+        setSocialError(err.message);
+      }
     } finally {
-      if (!cancelled) setSocialLoading(false);
+      if (!cancelled) {
+        setSocialLoading(false);
+      }
     }
   })();
 
-  return () => { cancelled = true; };
+  return () => {
+    cancelled = true;
+  };
 }, [id, apiUrl]);
+
 
 
   const tabs = [
@@ -242,7 +250,7 @@ export default function CandidatePage() {
                   <img
                     src={safeImageSrc}
                     onError={() => setImageFailed(true)}
-                    alt={`${name} profile image`}
+                    alt={`${candidate.name} profile image`}
                     className={styles.profileImage}
                     width={72}
                     height={72}
