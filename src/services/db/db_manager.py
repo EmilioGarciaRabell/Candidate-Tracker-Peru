@@ -96,7 +96,7 @@ class Database:
         if cls._pool:
             cls._pool.closeall()
             cls._pool = None
-            print("🧹 Database pool closed.")
+            print("Database pool closed.")
     # ------------------------ Public API ------------------------------
     
     def get_candidates_with_parties(self):

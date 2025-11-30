@@ -5,72 +5,41 @@ import s from "./userCard.module.css";
 import { useRouter } from "next/navigation";
 import profilePicture from "./profile.jpg";
 import { useEffect, useState } from "react";
+import { Party } from "@/interfaces/Party";
 
-type UserCardProps = Candidate & {
-  onImageReady?: () => void;
-};
-
-export default function UserCard({
-  name,
-  party,
-  age,
-  id,
-  onImageReady,
-}: UserCardProps) {
+export default function UserCard({ name, position,id }: Party) {
   const router = useRouter();
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageFailed, setImageFailed] = useState(false);
+  const safeImageSrc = imageFailed || !imageUrl ? profilePicture.src : imageUrl;
 
-  const safeImageSrc =
-    imageFailed || !imageUrl ? profilePicture.src : imageUrl;
 
   useEffect(() => {
-    let cancelled = false;
+  const fetch_images = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/pImage/${id}`, { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed image request");
 
-    const fetch_images = async () => {
-      try {
-        if (!apiUrl) {
-          // if API URL is missing, just fall back and mark as done
-          setImageFailed(true);
-          return;
-        }
+      const data = await res.json();
+      setImageUrl(data.url);
+    } catch (e) {
+      setImageFailed(true);
+    }
+  };
 
-        const res = await fetch(`${apiUrl}/image/${id}`, {
-          cache: "no-store",
-        });
-        if (!res.ok) throw new Error("Failed image request");
+  fetch_images();
+}, [id]);
 
-        const data = await res.json();
-        if (!cancelled) {
-          setImageUrl(data.url);
-        }
-      } catch (e) {
-        if (!cancelled) {
-          setImageFailed(true);
-        }
-      } finally {
-        if (!cancelled && onImageReady) {
-          onImageReady();
-        }
-      }
-    };
-
-    fetch_images();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id, apiUrl, onImageReady]);
 
   return (
     <article
       className={s.card}
       role="button"
       tabIndex={0}
-      onClick={() => router.push(`/candidate/${id}`)}
+      onClick={() => router.push(`/partido/${id}`)}
       onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") router.push(`/candidate/${id}`);
+        if (e.key === "Enter" || e.key === " ") router.push(`/partido/${id}`);
       }}
     >
       {/* Avatar */}
@@ -84,20 +53,20 @@ export default function UserCard({
             width={72}
             height={72}
           />
+
+
         </div>
       </div>
 
       {/* Title / Meta */}
       <header className={s.header}>
-        <h2 className={s.name} title={name}>
-          {name}
-        </h2>
+        <h2 className={s.name} title={name}>{name}</h2>
         <div className={s.metaRow}>
-          <span className={s.chip}>
+          {/* <span className={s.chip}>
             {party ? `Partido ${party}` : "Sin partido"}
-          </span>
+          </span> */}
           <span className={s.dot} />
-          <span className={s.metaText}>{age ?? "—"} años</span>
+          {/* <span className={s.metaText}>{position ?? "—"} Ideologia</span> */}
         </div>
       </header>
 
@@ -107,7 +76,7 @@ export default function UserCard({
           className={s.linkButton}
           onClick={(e) => {
             e.stopPropagation();
-            router.push(`/candidate/${id}`);
+            router.push(`/partido/${id}`);
           }}
         >
           Más info
@@ -119,13 +88,7 @@ export default function UserCard({
             fill="none"
             aria-hidden="true"
           >
-            <path
-              d="M5 12h14M13 5l7 7-7 7"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
+            <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </button>
       </footer>

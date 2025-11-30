@@ -8,6 +8,8 @@ from datetime import timezone
 import pytz
 
 
+from src.routes.google_cloud_storage import google_storage_bp
+from src.routes.parties_routes import PARTY
 
 def create_app():
     app = Flask(__name__)
@@ -20,9 +22,14 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(candidate_bp)
     app.register_blueprint(news_bp)
+    app.register_blueprint(google_storage_bp)
+    app.register_blueprint(PARTY)
 
+    for rule in app.url_map.iter_rules():
+        print(rule, rule.endpoint)
     return app
 
 if __name__ == "__main__":
+    
     app = create_app()
     app.run()

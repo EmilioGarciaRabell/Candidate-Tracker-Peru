@@ -9,3 +9,4 @@ gunicorn # For production purposes
 psycopg2
 apscheduler
 unidecode
+google-cloud-storage
