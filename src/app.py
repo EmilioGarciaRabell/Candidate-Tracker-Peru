@@ -25,8 +25,7 @@ def create_app():
     app.register_blueprint(google_storage_bp)
     app.register_blueprint(PARTY)
 
-    for rule in app.url_map.iter_rules():
-        print(rule, rule.endpoint)
+ 
     return app
 
 if __name__ == "__main__":

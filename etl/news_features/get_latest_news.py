@@ -8,8 +8,6 @@ import json
 from psycopg2 import sql
 from datetime import datetime
 from unidecode import unidecode
-from datetime import time
-from src.services.data_management import news
 from psycopg2.extras import Json
 
 
@@ -67,7 +65,7 @@ def get_all(item):
         select_query = ""
         if item == "candidate":
             select_query = sql.SQL("""
-                SELECT id,name from candidate_data.candidate_info
+                SELECT * from candidate_data.candidate_info
             """)
 
         elif item == "parties":
@@ -139,11 +137,11 @@ def retrieve_results(batch_time):
     interval1 = ''
     interval2 = ''
     if batch_time == 'morning':
-        interval1 = '7:00'
-        interval2 = '8:00'
+        interval1 = '00:00'
+        interval2 = '12:59'
     elif batch_time == 'evening':
-        interval1 = '19:00'
-        interval2 = '20:00' 
+        interval1 = '13:00'
+        interval2 = '23:59' 
     else:
          interval1 = 'batch_not_found'
          interval2 = 'batch_not_found'
@@ -167,7 +165,37 @@ def remove_accents(list):
     result = []
     for i in list:
         result.append(unidecode(i).lower())
-    return result   
+    return result  
+
+
+def tokenize_name(names,nicknames, keywords):    
+    for n in names:
+        n_tokens = unidecode(n.lower()).split()
+
+        for k in keywords:
+            k_token = unidecode(k.lower()).split()
+
+            for nick in nicknames:
+                if not nick.strip():  # skip empty nicknames
+                    continue
+                nick_token = unidecode(nick.lower()).split()
+
+                ##check if all nicknames are in keywords
+                count = 0
+                for token in nick_token:
+                    if token in k_token:
+                        count +=1
+                if count == len(nick_token):
+                    return True
+                
+            all_keyword_tokens = 0
+            for k_tok in k_token:
+                if k_tok in n_tokens:
+                    all_keyword_tokens +=1
+            if all_keyword_tokens == len(k_token):
+                return True
+            
+    return False
 
 def store_candidates_news(batch_time):
     conn = database_connection()
@@ -176,13 +204,13 @@ def store_candidates_news(batch_time):
     result = []
     for candidate in candidates:
         candidate_news = {      
-            "id": candidate["id"],
+            "id": candidate[0],
             "news": []
         }
         for n in news:
             if n is not None and n["keywords"] is not None:
                 clean_keywords = remove_accents(n["keywords"])
-                if unidecode(candidate["name"].lower()) in clean_keywords or unidecode(candidate["name"].lower()) in unidecode(n["title"].lower()):
+                if tokenize_name(candidate[1],candidate[11],clean_keywords):
                     candidate_news["news"].append({"title": n["title"],"link": n["link"],"keywords":n["keywords"]})
         result.append(candidate_news)
     
@@ -203,19 +231,18 @@ def store_candidates_news(batch_time):
 
 def run_morning_batch():
     print("Running morning batch...")
-    call_api_store_initial_news()
+    # call_api_store_initial_news()
     store_candidates_news("morning")
     print("Morning batch done")
 
 def run_evening_batch():
     print("Running evening batch...")
-    call_api_store_initial_news()
+    # call_api_store_initial_news()
     store_candidates_news("evening")
     print("Evening batch done")
 
-def main():
-    return
+
     
 
 if __name__ == "__main__":
-    main()
+    run_evening_batch()
