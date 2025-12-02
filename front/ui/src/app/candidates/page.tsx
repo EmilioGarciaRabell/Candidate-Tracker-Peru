@@ -11,13 +11,8 @@ export default function Candidates() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // UI controls
   const [query, setQuery] = useState("");
   const [partyFilter, setPartyFilter] = useState<string>("");
-
-  // image loading tracking
-  const [imagesDone, setImagesDone] = useState(0);
-  const [allImagesReady, setAllImagesReady] = useState(false);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -30,13 +25,13 @@ export default function Candidates() {
 
     setLoading(true);
     setError(null);
+
     try {
       const res = await fetch(`${apiUrl}/candidates`, { cache: "no-store" });
       if (!res.ok) throw new Error(`Error ${res.status}`);
-      const data = await res.json();
-      const list = (data.candidates ?? []) as Candidate[];
-      const shuffled = shuffleArray<Candidate>(list);
 
+      const data = await res.json();
+      const shuffled = shuffleArray<Candidate>(data.candidates ?? []);
       setCandidates(shuffled);
     } catch (err: any) {
       setError(err?.message || "Error al cargar candidatos");
@@ -47,7 +42,6 @@ export default function Candidates() {
 
   useEffect(() => {
     fetchCandidates();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const parties = useMemo(() => {
@@ -58,7 +52,6 @@ export default function Candidates() {
     return Array.from(set).sort();
   }, [candidates]);
 
-  // same filtered logic you already had
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return candidates.filter((c) => {
@@ -66,44 +59,23 @@ export default function Candidates() {
         !q ||
         c.name?.toLowerCase().includes(q) ||
         c.summary?.toLowerCase().includes(q);
+
       const matchesParty = !partyFilter || String(c.party_id) === partyFilter;
+
       return matchesQuery && matchesParty;
     });
   }, [candidates, query, partyFilter]);
 
-  // whenever the list of cards changes, reset image counters
-  useEffect(() => {
-    if (filtered.length === 0) {
-      setImagesDone(0);
-      setAllImagesReady(true); // nothing to load
-    } else {
-      setImagesDone(0);
-      setAllImagesReady(false);
-    }
-  }, [filtered]);
-
-  // callback passed to each UserCard
-  const handleImageReady = useCallback(() => {
-    setImagesDone((prev) => {
-      const next = prev + 1;
-      if (next >= filtered.length) {
-        setAllImagesReady(true);
-      }
-      return next;
-    });
-  }, [filtered.length]);
-
-
   function shuffleArray<T>(array: T[]): T[] {
-  const arr = [...array]; // avoid mutating original
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
   }
-  return arr;
-}
 
-  // Loading skeleton (data)
+  // Loading (ONLY DATA)
   if (loading) {
     return (
       <section className={`section ${s.pageBg}`}>
@@ -127,7 +99,7 @@ export default function Candidates() {
     );
   }
 
-  // Error state
+  // Error
   if (error) {
     return (
       <section className="section">
@@ -137,10 +109,7 @@ export default function Candidates() {
               <strong>Ocurrió un problema</strong>
             </p>
             <p className="mb-4">{error}</p>
-            <button
-              className="button is-danger is-light"
-              onClick={fetchCandidates}
-            >
+            <button className="button is-danger is-light" onClick={fetchCandidates}>
               Reintentar
             </button>
           </div>
@@ -152,7 +121,6 @@ export default function Candidates() {
   return (
     <section className={`section ${s.pageBg}`}>
       <div className="container">
-        {/* HERO / HEADER */}
         <div className={`hero ${s.heroSoft}`}>
           <div className="hero-body py-5">
             <div className={s.heroRow}>
@@ -169,7 +137,7 @@ export default function Candidates() {
           </div>
         </div>
 
-        {/* CONTROLS */}
+        {/* Filtros */}
         <div className={`box ${s.filtersBox} mt-5`}>
           <div className="columns is-variable is-4 is-multiline">
             <div className="column is-12-mobile is-7-tablet">
@@ -181,10 +149,9 @@ export default function Candidates() {
                     placeholder="Buscar por nombre o descripción…"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    aria-label="Buscar"
                   />
                   <span className="icon is-small is-left">
-                    <i className="fas fa-search" aria-hidden="true"></i>
+                    <i className="fas fa-search"></i>
                   </span>
                 </div>
               </div>
@@ -197,7 +164,6 @@ export default function Candidates() {
                     <select
                       value={partyFilter}
                       onChange={(e) => setPartyFilter(e.target.value)}
-                      aria-label="Filtrar por partido"
                     >
                       <option value="">Todos los partidos</option>
                       {parties.map((p) => (
@@ -213,24 +179,12 @@ export default function Candidates() {
           </div>
         </div>
 
-        {/* IMAGE LOADING OVERLAY (only after data is ready) */}
-        {!allImagesReady && filtered.length > 0 && (
-          <div className={s.imageLoadingOverlay}>
-            <div className={s.imageLoadingBox}>
-              <p className="title is-5 mb-1">Cargando imágenes…</p>
-              <p className="has-text-grey is-size-7">
-                {imagesDone} / {filtered.length}
-              </p>
-            </div>
-          </div>
-        )}
-
         {/* GRID */}
         {filtered.length === 0 ? (
           <div className="box has-text-centered">
             <p className="title is-5 mb-2">No se encontraron candidatos</p>
             <p className="has-text-grey mb-4">
-              Intenta limpiar los filtros o utiliza otro término de búsqueda.
+              Intenta limpiar los filtros o usa otro término.
             </p>
             <button
               className="button is-light"
@@ -246,7 +200,7 @@ export default function Candidates() {
           <ul className={s.grid} role="list">
             {filtered.map((c) => (
               <li key={c.id} className={s.gridItem} role="listitem">
-                <UserCard {...c} onImageReady={handleImageReady} />
+                <UserCard {...c} />
               </li>
             ))}
           </ul>

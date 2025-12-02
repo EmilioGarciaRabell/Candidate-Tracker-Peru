@@ -168,3 +168,13 @@ body {
   @apply
     px-5 py-2.5 text-base transition-all duration-200 hover:bg-red-400 hover:text-black focus:text-black focus:bg-yellow-400 font-semibold text-white bg-black rounded-full
 }
+
+
+
+/*Candidate Tabs */
+.job-entry strong,
+.edu-entry strong {
+    /* Use a dark color, e.g., Bulma's dark grey */
+    color: #363636; 
+    font-weight: 600; /* Ensure it's bold */
+}
