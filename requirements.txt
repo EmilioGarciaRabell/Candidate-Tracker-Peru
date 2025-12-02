@@ -9,3 +9,4 @@ gunicorn # For production purposes
 psycopg2
 transformers
 torch
+google-cloud-storage
