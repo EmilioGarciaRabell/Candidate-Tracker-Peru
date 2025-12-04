@@ -11,7 +11,7 @@ def get_candidates() -> list[dict]:
 
 def get_candidate(id) -> dict:
     """ get candidate from id """
-    candidate = CANDIDATES_TABLE.select('name, age, party_id, education_1,summary, work_experience_2, polemicas, ref', f"id = {id}")[0]
+    candidate = CANDIDATES_TABLE.select('id, name, age, party_id, education_1,summary, work_experience_2, polemicas, ref', f"id = {id}")[0]
     candidate["party_id"] = PARTIES_TABLE.select("name", f"id = {candidate.get('party_id')}")[0].get("name")
     return candidate
 

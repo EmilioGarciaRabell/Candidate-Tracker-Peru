@@ -19,7 +19,7 @@ export default function PublicOpinionSection({ candidateId }: Props) {
   const [err, setErr] = useState<string | null>(null);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "";
-
+  
   useEffect(() => {
     let cancelled = false;
 

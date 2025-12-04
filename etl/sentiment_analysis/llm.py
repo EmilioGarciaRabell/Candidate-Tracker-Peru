@@ -28,7 +28,7 @@ def get_sentiment_summary(candidate, sentiment, posts_info):
     ### Objetivo:
     Genera un análisis textual con el siguiente formato:
     {{
-      "title": título corto del hallazgo principal (máx. 10 palabras),
+      "title": título corto del hallazgo principal (máx. 10 palabras) agrega la fecha exacta aqui,
       "summary": resumen conciso del sentimiento general (2-3 oraciones),
       "content": análisis detallado y objetivo (máx. 200 palabras)
     }}

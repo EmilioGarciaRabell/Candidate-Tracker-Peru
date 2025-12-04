@@ -27,6 +27,8 @@ def process_content_sentiment(content: list[dict]):
     overall_sentiment = {"negative":0, "neutral":0, "positive":0}
     
     for item in content:
+        if item is None or len(item) == 0:
+            continue
         analyzed_comments = 0
         comments_sentiment = {"negative":0, "neutral":0, "positive":0}
 
@@ -65,8 +67,13 @@ def process_content_sentiment(content: list[dict]):
 
 def get_candidate_sentiment(candidate:str, id: int):
     # get content
-    
-    reddit_content = reddit_scrapper.get_reddit_posts_and_comments(candidate, "Lima_Peru")
+    sub_reddits = ["Lima_Peru", "PERU"]
+    reddit_content = []
+    print(f"getting {candidate} reddit content")
+    for reddit in sub_reddits:
+        reddit_content += reddit_scrapper.get_reddit_posts_and_comments(candidate, reddit)
+
+    print(f"getting {candidate} twitter content")
     twitter_content = twitter_scrapper.get_tweets_and_comments(candidate)
 
     overall_content = reddit_content + twitter_content
@@ -86,11 +93,10 @@ def get_candidates_id():
         # Connect to the DB
         conn = psycopg2.connect(database_url)
         cur = conn.cursor()
-        query = sql.SQL(f"SELECT id, name FROM candidate_data.candidate_info")
+        query = sql.SQL(f"SELECT id, name FROM candidate_data.candidate_info ORDER BY id asc")
         cur.execute(query)
 
         candidates = cur.fetchall()
-        print(candidates)
         cur.close()
         conn.close()
         return candidates
@@ -143,19 +149,26 @@ def insert_sentiment(content, candidate_id):
         cur = conn.cursor()
 
         sql = """
-            INSERT INTO candidate_data.sentiment_analysis(candidate_id,negative, positive, neutral, title, summary, content)
-            VALUES (%s,%s,%s,%s,%s,%s,%s);
-                
+            UPDATE candidate_data.sentiment_analysis
+            SET
+                negative = %s,
+                positive = %s,
+                neutral = %s,
+                title = %s,
+                summary = %s,
+                content = %s
+            WHERE candidate_id = %s;
         """
 
         cur.execute(sql, (
-            candidate_id,
+            
             negative,
             positive,
             neutral,
             title,
             summary,
-            body
+            body,
+            candidate_id
             
         ))
 
@@ -166,6 +179,7 @@ def insert_sentiment(content, candidate_id):
        
 
     except Exception as e:
+        print("Error puto")
         return {"status": "error", "message": str(e)}
 
 if __name__ == "__main__":

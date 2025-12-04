@@ -2,6 +2,8 @@ import requests
 from datetime import datetime, timedelta, timezone
 import os
 from dotenv import load_dotenv
+from concurrent.futures import ThreadPoolExecutor
+
 
 
 load_dotenv()
@@ -14,15 +16,18 @@ def get_tweets_and_comments(candidate):
     query = f'"{candidate}" lang:es -is:retweet'
     params = {
         "query": query,
-        "queryType": "Top",
+        "queryType": "Latest",
         "cursor": ""
     }
     headers = {"X-API-Key": TWITTER_API_KEY}
 
     all_tweets = []
-    page = 1
+    conversation_ids = []
 
-    while page < 3: #while True:
+    now = datetime.now(timezone.utc)
+    page = 1
+    in_this_week = True
+    while in_this_week:
         response = requests.get(endpoint, headers=headers, params=params)
 
         if response.status_code != 200:
@@ -36,48 +41,55 @@ def get_tweets_and_comments(candidate):
         page += 1
 
         for t in tweets:
+            created_at_str = t.get("createdAt")
+            if not created_at_str:
+                continue
+
+            created_at = datetime.strptime(created_at_str, "%a %b %d %H:%M:%S %z %Y")
+
+            # If sorted newest → oldest, this means ALL NEXT tweets are even older
+            if now - created_at > timedelta(days=7):
+                in_this_week = False
+                break
+
+            conversation_id = t.get("conversationId")
+            if conversation_id:
+                conversation_ids.append(conversation_id)
+
             author = t.get("author", {})
-            created_at_str = t.get("createdAt", "N/A")
-            text = t.get("text", "")
+            all_tweets.append({
+                "author": author,
+                "username": author.get("username") or author.get("name") or "unknown",
+                "text": t.get("text", ""),
+                "likes": t.get("likeCount", 0),
+                "retweets": t.get("retweetCount", 0),
+                "created": created_at_str,
+                "conversationId": conversation_id
+            })
 
-
-            if created_at_str:
-                created_at = datetime.strptime(created_at_str, "%a %b %d %H:%M:%S %z %Y")
-
-                # Compare using UTC
-                now = datetime.now(timezone.utc)
-
-                if now - created_at > timedelta(days=15):
-                    return all_tweets  # tweet is older than 15 days
-
-
-                conversation_id = t.get("conversationId")
-                comments = []
-                if conversation_id:
-                    comments =  get_tweet_replies(conversation_id, headers)
-                
-                
-                all_tweets.append({
-                    "author": author,
-                    "username": author.get("username") or author.get("name") or "unknown",
-                    "text": text,
-                    "likes": t.get("likeCount", 0),
-                    "retweets": t.get("retweetCount", 0),
-                    
-                    "created":created_at_str,
-                    "comments": comments
-                })
-
-        # Pagination: Stop if no next page
         if not data.get("has_next_page"):
-            print("No more pages.")
             break
 
-        # Update cursor for next request
         params["cursor"] = data.get("next_cursor", "")
         if not params["cursor"]:
-            print("Cursor missing, stopping.")
             break
+
+    # === Fetch replies in parallel ===
+    print("processing comments")
+    def fetch_replies(cid):
+        return cid, get_tweet_replies(cid, headers)
+
+    replies_map = {}
+
+    with ThreadPoolExecutor(max_workers=15) as pool:
+        for cid, comments in pool.map(fetch_replies, conversation_ids):
+            replies_map[cid] = comments
+
+    # Attach comments
+    for tweet in all_tweets:
+        cid = tweet["conversationId"]
+        tweet["comments"] = replies_map.get(cid, [])
+
     return all_tweets
 
 
@@ -121,3 +133,8 @@ def get_tweet_replies(tweet_id, headers, max_replies=100):
             break
 
     return all_replies
+
+
+
+
+

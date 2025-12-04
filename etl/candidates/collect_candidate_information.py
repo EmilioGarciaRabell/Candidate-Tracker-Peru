@@ -119,7 +119,8 @@ def extract_candidate_category_info(text, candidate, category, category_instruct
 
     prompt = f"""
     Eres un analista experto.
-    Tarea: Extraer información del candidato **{candidate}** para la categoría **{category}**.
+    Tarea: Extraer información del candidato **{candidate}** para la categoría **{category}** esta tendra que ser utilizada en el ref.
+    E
     
     Instrucciones específicas: {category_instructions}
     
@@ -128,7 +129,7 @@ def extract_candidate_category_info(text, candidate, category, category_instruct
     """
 
     response = client.models.generate_content(
-        model="gemini-3-pro-preview", 
+        model="gemini-2.5-pro", 
         contents=prompt,
         config={
             "response_mime_type": "application/json",
@@ -191,7 +192,7 @@ def get_category_links(candidate, category):
         data = r.json()
 
         results = data.get("organic", None)
-        if len(results) == 0 and i <len(categories[category])-1:
+        if results and len(results) == 0 and i <len(categories[category])-1:
             i+=1
             continue
         return results

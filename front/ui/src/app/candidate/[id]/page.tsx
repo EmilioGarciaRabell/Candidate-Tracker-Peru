@@ -126,7 +126,7 @@ export default function CandidatePage() {
         if (!res.ok) throw new Error("Fetch failed");
         const data = await res.json();
         if (!cancelled) setCandidate(data.candidate ?? null);
-        
+        console.log(data.candidate)
       } catch {
         if (!cancelled) setCandidate(null);
       } finally {
@@ -203,7 +203,7 @@ useEffect(() => {
         />
     );
 };
-
+  
   const tabs = [
     ["historia", "Historia"],
     ["educacion", "Educacion"],
@@ -261,7 +261,7 @@ const renderStructuredContent = (
     </div>
   );
 };
-
+  
 
 
   if (loading) {
@@ -425,7 +425,7 @@ const renderStructuredContent = (
             <div className={`box ${styles.boxSoft}`} id={`panel-${activeTab}`} role="tabpanel">
               {activeTab === "historia" && (
                 <>
-                  <h3 className="title is-5">Acerca de mí</h3>
+                  <h3 className="title is-5">Acerca de</h3>
                   <p className="content">{candidate.summary ?? "No hay información disponible."}</p>
                 </>
               )}
