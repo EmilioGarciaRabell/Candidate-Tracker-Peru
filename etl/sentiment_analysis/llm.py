@@ -1,14 +1,15 @@
 import os
 from google import genai
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-
+TODAY_STR = datetime.today().strftime("%d/%m/%Y")
 
 def get_sentiment_summary(candidate, sentiment, posts_info):
     client = genai.Client(api_key=GEMINI_API_KEY)
-
+    
     # We'll only ask Gemini to produce title, summary, and content.
     schema = {
         "type": "object",
@@ -23,12 +24,12 @@ def get_sentiment_summary(candidate, sentiment, posts_info):
     prompt = f"""
     Eres un analista político experto en opinión pública y tendencias electorales.
     Analiza los datos de sentimiento en redes sociales sobre el candidato "{candidate}"
-    durante las elecciones peruanas de 2026.
+    durante las elecciones peruanas de 2026. 
 
     ### Objetivo:
     Genera un análisis textual con el siguiente formato:
     {{
-      "title": título corto del hallazgo principal (máx. 10 palabras) agrega la fecha exacta aqui,
+      "title": título corto del hallazgo principal (máx. 10 palabras) agrega la fecha exacta aqui, hoy es {TODAY_STR},
       "summary": resumen conciso del sentimiento general (2-3 oraciones),
       "content": análisis detallado y objetivo (máx. 200 palabras)
     }}
