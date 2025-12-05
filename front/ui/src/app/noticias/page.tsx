@@ -4,6 +4,8 @@ import { useEffect, useState } from "react"
 import "bulma/css/bulma.min.css";
 import { Candidate } from "@/interfaces/CandidateInterface";
 import { News } from "@/interfaces/News";
+import s from "./noticias.module.css";
+
 
 
 export default function Noticias(){
@@ -15,7 +17,16 @@ export default function Noticias(){
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchCandidates = async () => {
+    function formatNews(news: News[], candidates: Candidate[]) {
+        return news.map(n => {
+            const candidate = candidates.find(c => c.id === n.id);
+            return {
+            ...n,
+            name: candidate?.name, 
+            };
+        });
+    }
+    const loadData = async () => {
         if (!apiUrl) {
           setError("La URL de la API no está configurada (NEXT_PUBLIC_API_URL).");
           setLoading(false);
@@ -25,12 +36,29 @@ export default function Noticias(){
         setLoading(true);
         setError(null);
         try {
-          const res = await fetch(`${apiUrl}/candidates`, { cache: "no-store" });
-          if (!res.ok) throw new Error(`Error ${res.status}`);
-          const data = await res.json();
+        
+          const t = new Date()
+          const hours = t.getHours()
+          console.log(hours)
+          const timeParam = hours < 14 ? "morning" : "evening"; 
+          const [candidatesRes, newsRes] = await Promise.all([
+                fetch(`${apiUrl}/candidates`),
+                fetch(`${apiUrl}/api/news/${timeParam}`),
+          ]);
+
+          //feth candidates
+          const data = await candidatesRes.json();
           const list = (data.candidates ?? []) as Candidate[];
-    
-          setCandidates(list);
+
+          //fetch news
+            const newsdata = await newsRes.json();
+            const newslist = (newsdata ?? []) as News[];
+
+            const newsformat = formatNews(newslist,list)
+
+            setCandidates(list);
+            setNews(newsformat)
+
         } catch (err: any) {
           setError(err?.message || "Error al cargar candidatos");
         } finally {
@@ -39,61 +67,65 @@ export default function Noticias(){
       };
 
 
-
-  const fetchNews = async () =>{
-    if(!apiUrl){
-        setError("error when fetching news")
-        setLoading(false);
-        return
-    }
-
-    setError(null)
-    setLoading(true);
-
-    try{
-        const t = new Date()
-        const hours = t.getHours()
-        
-        //in the morning display the morning news, in the evening change to evening news
-   
-        const timeParam = hours < 14 ? "morning" : "evening"; 
-        const res = await fetch(`${apiUrl}/api/news/${timeParam}`)
-        if (!res.ok) throw new Error(`Error ${res.status}`);
-        const data = await res.json();
-        const list = (data ?? []) as News[];
-        setNews(list)
-          
-    }catch(err:any){
-        setError(err?.message || "Error al cargar news");
-
-    }finally{
-        setLoading(false)
-    }
-  }
-
-    function formatNews(news: News[], candidates: Candidate[]) {
-        return news.map(n => {
-            const candidate = candidates.find(c => c.id === n.id);
-            return {
-            ...n,
-            candidate_name: candidate?.name, 
-            };
-        });
-    }
+//add candidates with news at the top
 
 useEffect(() => {
-        fetchCandidates();
-        fetchNews();
-        const n = formatNews(news,candidates)
-        setNews(n)
+        loadData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
+        console.log(news)
   }, []);
 
+   useEffect(() => {
+    if (news) {
+      console.log('Updated API data in state:', news); // Log after state update
+    }
+  }, [news]); // Run when apiData changes
 
-    return <>
+    const [openIndex, setOpenIndex] = useState(0)
 
-        {news.map((n) => (
-            <p key={n.id}>{n.id} - {n.news}</p>
-        ))}
-    </>
+    const toggle = (i: number) => {
+    setOpenIndex(openIndex === i ? 0 : i);
+  };
+
+  return (
+    <section className={s.pageBg}>
+      <div className="container">
+        <ul className={s.grid} role="list">
+          {news?.map((n, i) => (
+            <li key={i} className={s.gridItem} role="listitem">
+              <div className={s.dropdown}>
+                <button
+                  className={s.dropdownHeader}
+                  onClick={() => toggle(i)}
+                >
+                  <span>{n.name}</span>
+                  <span className={s.count}>{n.news.length}</span>
+
+                  <span
+                    className={`${s.caret} ${
+                      openIndex === i ? s.open : ""
+                    }`}
+                  >
+                    +
+                  </span>
+                </button>
+
+                <div
+                  className={`${s.dropdownBody} ${
+                    openIndex === i ? s.show : ""
+                  }`}
+                >
+                  {n.news?.map((item, j) => (
+                    <a key={j} href={item.link} className={s.dropdownItem}>
+                      {item.title}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
 }

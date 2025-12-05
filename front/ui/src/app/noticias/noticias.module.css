@@ -1,0 +1,112 @@
+/* Page background + soft hero */
+.pageBg {
+  background: linear-gradient(180deg, #fafcff 0%, #ffffff 40%);
+}
+/* Responsive grid */
+.grid {
+  --min: 260px;
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--min), 1fr));
+  gap: 1.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+.gridItem {
+  /* In case UserCard has no outer spacing */
+  border-radius: 12px; /* visual consistency if bare content */
+}
+
+
+/* Container */
+.dropdown {
+  width: 100%;
+  border-bottom: 1px solid #eaeaea;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+/* Header line (name + count + caret) */
+.dropdownHeader {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #222;
+}
+
+/* Count number on the right */
+.count {
+  font-size: 1rem;
+  opacity: 0.6;
+  margin-right: 8px;
+}
+
+/* caret (“+”) rotated when open */
+.caret {
+  font-size: 1.5rem;
+  transform: rotate(0deg);
+  transition: transform 0.25s ease;
+  opacity: 0.7;
+}
+
+.caret.open {
+  transform: rotate(45deg); /* + becomes × */
+  opacity: 1;
+}
+
+/* Dropdown content (hidden by default) */
+.dropdownBody {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+}
+
+/* When open */
+.show {
+  max-height: 600px; /* plenty of room */
+}
+
+/* Each item inside */
+.dropdownItem {
+  display: block;
+  padding: 10px 0;
+  font-size: 1rem;
+  color: #222;
+  text-decoration: none;
+  border-bottom: 1px solid #f2f2f2;
+  transition: opacity 0.2s;
+}
+
+.dropdownItem:hover {
+  opacity: 0.6;
+}
+
+/* Optional: remove bottom border from last */
+.dropdownItem:last-child {
+  border-bottom: none;
+}
+
+
+
+
+@keyframes pulseFade {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+/* Compact tweaks */
+@media (max-width: 768px) {
+  .grid { --min: 220px; }
+}
+

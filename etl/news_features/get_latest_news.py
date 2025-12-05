@@ -132,7 +132,7 @@ def retrieve_results(batch_time):
     query = """
         select  * from candidate_data.all_news
         where fetch_data::time BETWEEN (%s) and (%s)
-        and fetch_data::date = CURRENT_DATE - 1
+        and fetch_data::date = CURRENT_DATE
     """
     interval1 = ''
     interval2 = ''
@@ -237,7 +237,7 @@ def run_morning_batch():
 
 def run_evening_batch():
     print("Running evening batch...")
-    # call_api_store_initial_news()
+    call_api_store_initial_news()
     store_candidates_news("evening")
     print("Evening batch done")
 
