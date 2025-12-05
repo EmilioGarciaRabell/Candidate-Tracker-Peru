@@ -16,8 +16,6 @@ export interface Candidate {
     ref: CandidateRefs;
     summary: string;
     work_experience: string;
-    work_experience_2: string;
     polemicas: string;
     education : string;
-    education_1 : string;
 }

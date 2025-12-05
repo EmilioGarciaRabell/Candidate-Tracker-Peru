@@ -311,8 +311,8 @@ def insert_content(content, candidate_id, category):
     column_map = {
         "Polemicas": "polemicas",
         "Biografia": "summary",
-        "Experiencia Laboral": "work_experience_2",
-        "Educacion": "education_1",
+        "Experiencia Laboral": "work_experience",
+        "Educacion": "education",
     }
 
     column_name = column_map.get(category)

@@ -436,8 +436,8 @@ const renderStructuredContent = (
                     <div className={styles.subtleDivider} />
                     
                     {/* Check if education is a truthy string AND is not "not_found" */}
-                    {candidate.education_1 && candidate.education_1 !== "not_found" ? ( 
-                        renderStructuredContent(candidate.education_1, "Educacion")
+                    {candidate.education && candidate.education !== "not_found" ? ( 
+                        renderStructuredContent(candidate.education, "Educacion")
                     ) : (
                         <p className="has-text-grey">No hay información disponible</p>
                     )}
@@ -451,8 +451,8 @@ const renderStructuredContent = (
                     
                     {/* Llama a la función de renderizado estructurado para "Experiencia Laboral" */}
                     {/* Verifica que exista el contenido y que no sea el string literal de "not_found" */}
-                    {candidate.work_experience_2 && candidate.work_experience_2 !== "not_found" ? ( 
-                        renderStructuredContent(candidate.work_experience_2, "Experiencia Laboral")
+                    {candidate.work_experience && candidate.work_experience !== "not_found" ? ( 
+                        renderStructuredContent(candidate.work_experience, "Experiencia Laboral")
                     ) : (
                         <p className="has-text-grey">No hay información disponible</p>
                     )}

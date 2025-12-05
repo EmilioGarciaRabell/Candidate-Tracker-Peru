@@ -7,7 +7,7 @@ google_storage_bp = Blueprint('storage', __name__)
 @google_storage_bp.get("/image/<int:filename>")
 def get_image_url(filename):
     client = storage.Client()
-    bucket = client.bucket("images_candidate_tracking_candidates_south_america")
+    bucket = client.bucket("images_candidate_tracker_candidates")
     blob = bucket.blob(str(filename))
     url = blob.generate_signed_url(
         version="v4",
