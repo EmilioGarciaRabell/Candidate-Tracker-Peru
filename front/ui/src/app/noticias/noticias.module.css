@@ -2,10 +2,27 @@
 .pageBg {
   background: linear-gradient(180deg, #fafcff 0%, #ffffff 40%);
 }
+
+.heroSoft {
+  margin-top: 2rem;
+  background: #ffffff;
+  border: 1px solid rgba(16, 24, 40, 0.06);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.04);
+}
+
+.heroRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+
 /* Responsive grid */
 .grid {
   --min: 260px;
-  margin-top: 1rem;
+  margin-top: 2rem;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(var(--min), 1fr));
   gap: 1.25rem;

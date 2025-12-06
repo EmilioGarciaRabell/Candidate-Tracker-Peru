@@ -16,6 +16,9 @@ export default function Noticias(){
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const currentNews = 3
+    const [visibleNews, setVisibleNews] = useState(currentNews)
+    const [newsLength, setNewsLength] = useState(0)
 
     function formatNews(news: News[], candidates: Candidate[]) {
         return news.map(n => {
@@ -26,6 +29,22 @@ export default function Noticias(){
             };
         });
     }
+
+    function updateCurrentNewsVisibility() {
+        if (visibleNews < newsLength){
+            const news = visibleNews + currentNews
+            setVisibleNews(news)
+        }
+        
+    }
+
+    function previousPage() {
+        if (visibleNews >= 0){
+            const news = visibleNews - currentNews
+            setVisibleNews(news)
+        }
+    }
+
     const loadData = async () => {
         if (!apiUrl) {
           setError("La URL de la API no está configurada (NEXT_PUBLIC_API_URL).");
@@ -36,14 +55,9 @@ export default function Noticias(){
         setLoading(true);
         setError(null);
         try {
-        
-          const t = new Date()
-          const hours = t.getHours()
-          console.log(hours)
-          const timeParam = hours < 14 ? "morning" : "evening"; 
           const [candidatesRes, newsRes] = await Promise.all([
                 fetch(`${apiUrl}/candidates`),
-                fetch(`${apiUrl}/api/news/${timeParam}`),
+                fetch(`${apiUrl}/api/news`),
           ]);
 
           //feth candidates
@@ -55,7 +69,7 @@ export default function Noticias(){
             const newslist = (newsdata ?? []) as News[];
 
             const newsformat = formatNews(newslist,list)
-
+            setNewsLength(newslist.length)
             setCandidates(list);
             setNews(newsformat)
 
@@ -68,10 +82,8 @@ export default function Noticias(){
 
 
 //add candidates with news at the top
-
 useEffect(() => {
         loadData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         console.log(news)
   }, []);
 
@@ -81,17 +93,31 @@ useEffect(() => {
     }
   }, [news]); // Run when apiData changes
 
-    const [openIndex, setOpenIndex] = useState(0)
+    const [openIndex, setOpenIndex] = useState(-1)
 
     const toggle = (i: number) => {
-    setOpenIndex(openIndex === i ? 0 : i);
+    setOpenIndex(openIndex === i ? -1 : i);
   };
 
   return (
     <section className={s.pageBg}>
       <div className="container">
+        {/* HERO / HEADER */}
+        <div className={`hero ${s.heroSoft}`}>
+          <div className="hero-body py-5">
+            <div className={s.heroRow}>
+              <div>
+                <h1 className="title is-3 mb-1">Noticias Semanales</h1>
+                <p className="subtitle is-6 has-text-grey">
+                  Explora las noticias semanales de cada candidato
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <ul className={s.grid} role="list">
-          {news?.map((n, i) => (
+          {news?.slice(visibleNews - currentNews, visibleNews).map((n, i) => (
             <li key={i} className={s.gridItem} role="listitem">
               <div className={s.dropdown}>
                 <button
@@ -125,6 +151,15 @@ useEffect(() => {
             </li>
           ))}
         </ul>
+        <div>
+            {visibleNews > 3 && (
+            <button onClick={previousPage}>Anterior</button>
+        )}
+          {visibleNews < news.length && (
+        <button onClick={updateCurrentNewsVisibility}>Siguiente </button>
+        )}
+        </div>
+        
       </div>
     </section>
   );

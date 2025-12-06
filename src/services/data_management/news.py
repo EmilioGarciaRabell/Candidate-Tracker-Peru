@@ -72,14 +72,14 @@ def store_candidates_news(batch_time):
             BATCH_TABLE._release_conn(conn)
     return result
 
-def get_news(batch_time):
+def get_news():
     conn = BATCH_TABLE._get_conn()
     sql = """
-    select news_json FROM candidate_data.news_batch WHERE batch = (%s) and date_time = CURRENT_DATE - 1
+    select news_json FROM candidate_data.news_batch order by date_time desc FETCH FIRST ROW ONLY;
     """
     try:
             with conn.cursor() as cur:
-                cur.execute(sql, (batch_time,))
+                cur.execute(sql)
                 colnames = [c[0] for c in cur.description]
                 return [dict(zip(colnames, r)) for r in cur.fetchall()]
     finally:

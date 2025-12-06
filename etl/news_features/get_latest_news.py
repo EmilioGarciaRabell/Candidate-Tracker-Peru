@@ -13,7 +13,7 @@ from psycopg2.extras import Json
 
 
 NEWS_API = os.environ.get("CARLA_API")
-api_url = f"https://newsdata.io/api/1/latest?country=PE&apikey={NEWS_API}"
+api_url = f"https://newsdata.io/api/1/archive?country=PE&apikey={NEWS_API}"
 
 def database_connection():
     database_url = os.environ.get("DATABASE_URL")
@@ -127,27 +127,14 @@ def call_api_store_initial_news():
         return None
 
 
-def retrieve_results(batch_time):
+def retrieve_results():
     conn = database_connection()
     query = """
         select  * from candidate_data.all_news
-        where fetch_data::time BETWEEN (%s) and (%s)
-        and fetch_data::date = CURRENT_DATE
     """
-    interval1 = ''
-    interval2 = ''
-    if batch_time == 'morning':
-        interval1 = '00:00'
-        interval2 = '12:59'
-    elif batch_time == 'evening':
-        interval1 = '13:00'
-        interval2 = '23:59' 
-    else:
-         interval1 = 'batch_not_found'
-         interval2 = 'batch_not_found'
     try:
         with conn.cursor() as cur:
-                cur.execute(query,(interval1,interval2))
+                cur.execute(query)
                 colnames = [c[0] for c in cur.description]
                 return [dict(zip(colnames, r)) for r in cur.fetchall()]
     except Exception as e:
@@ -197,9 +184,11 @@ def tokenize_name(names,nicknames, keywords):
             
     return False
 
-def store_candidates_news(batch_time):
+
+##script that will run every 7 days (sunday)
+def store_candidates_news():
     conn = database_connection()
-    news = retrieve_results(batch_time)
+    news = retrieve_results()
     candidates = get_all("candidate")   
     result = []
     for candidate in candidates:
@@ -210,18 +199,28 @@ def store_candidates_news(batch_time):
         for n in news:
             if n is not None and n["keywords"] is not None:
                 clean_keywords = remove_accents(n["keywords"])
-                if tokenize_name(candidate[1],candidate[11],clean_keywords):
+                if tokenize_name(candidate[1],candidate[9],clean_keywords):
                     candidate_news["news"].append({"title": n["title"],"link": n["link"],"keywords":n["keywords"]})
         result.append(candidate_news)
     
     current_time = datetime.now().date()
     query = """
-        INSERT INTO candidate_data.news_batch(batch,news_json,date_time)
-        VALUES (%s,%s,%s)
+        INSERT INTO candidate_data.news_batch(news_json,date_time)
+        VALUES (%s,%s)
+        """
+    query2 = """
+        INSERT INTO candidate_data.past_news
+        SELECT * FROM candidate_data.all_news
+        """
+    
+    query3 = """
+        truncate table candidate_data.all_news
         """
     try:
         with conn.cursor() as cur:
-                cur.execute(query,(batch_time, Json(result) , current_time))
+                cur.execute(query,( Json(result) , current_time))
+                cur.execute(query2)
+                cur.execute(query3)
                 conn.commit()
     finally:
             cur.close()
@@ -229,20 +228,18 @@ def store_candidates_news(batch_time):
     return result
 
 
-def run_morning_batch():
-    print("Running morning batch...")
-    # call_api_store_initial_news()
-    store_candidates_news("morning")
-    print("Morning batch done")
-
-def run_evening_batch():
-    print("Running evening batch...")
+def news_daily_script():
+    print("Running news daily script...")
     call_api_store_initial_news()
-    store_candidates_news("evening")
-    print("Evening batch done")
+    print("news daily script done")
 
+def news_weekly_srcipt():
+    print("Running weekly script...")
+    store_candidates_news()
+    print("Weekly script done")
 
-    
 
 if __name__ == "__main__":
-    run_evening_batch()
+    news_weekly_srcipt()
+
+

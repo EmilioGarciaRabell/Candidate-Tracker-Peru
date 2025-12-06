@@ -19,9 +19,9 @@ def run_evening_batch():
 
  
 
-@news_bp.route("/api/news/<string:batch>", methods=["GET"])
-def get_candidate_news(batch):
-    n = news.get_news(batch)
+@news_bp.route("/api/news", methods=["GET"])
+def get_candidate_news():
+    n = news.get_news()
     if not n:
         return jsonify({"news": []})
     return jsonify(n[0]["news_json"])
