@@ -15,17 +15,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap:4rem;
 }
 
 
 /* Responsive grid */
 .grid {
-  --min: 260px;
   margin-top: 2rem;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--min), 1fr));
-  gap: 1.25rem;
+  grid-template-rows: minmax(var(--min), auto);
+  gap: 5rem;
   padding: 0;
   list-style: none;
 }
@@ -33,6 +32,9 @@
 .gridItem {
   /* In case UserCard has no outer spacing */
   border-radius: 12px; /* visual consistency if bare content */
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px gray;
 }
 
 
@@ -61,11 +63,17 @@
   color: #222;
 }
 
+.extraItems{
+  display: flex;
+  align-items: center;
+  gap: 10px
+}
+
 /* Count number on the right */
 .count {
   font-size: 1rem;
   opacity: 0.6;
-  margin-right: 8px;
+  margin-top: 1px;
 }
 
 /* caret (“+”) rotated when open */
@@ -74,11 +82,52 @@
   transform: rotate(0deg);
   transition: transform 0.25s ease;
   opacity: 0.7;
+  margin-bottom: 4px;
 }
 
 .caret.open {
   transform: rotate(45deg); /* + becomes × */
   opacity: 1;
+}
+
+/* Count chip */
+.countTag {
+  border-radius: 999px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  background: #f5fbff !important;
+  color: #1275d1 !important;
+  border: 1px solid #d9ebff !important;
+}
+
+/* Filters box */
+.filtersBox {
+  border: 1px solid rgba(16, 24, 40, 0.06);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(16, 24, 40, 0.04);
+}
+
+/* Inputs */
+.input {
+  background: #ffffff !important;
+  border: 1px solid #e6edf5 !important;
+  color: #2b2f36 !important;
+  border-radius: 10px !important;
+}
+.input:focus {
+  border-color: #bcdfff !important;
+  box-shadow: 0 0 0 0.125em rgba(0, 123, 255, 0.12) !important;
+}
+
+/* Select */
+.select select {
+  background: #ffffff !important;
+  border: 1px solid #e6edf5 !important;
+  color: #2b2f36 !important;
+  border-radius: 10px !important;
+}
+.select:focus-within select {
+  border-color: #bcdfff !important;
+  box-shadow: 0 0 0 0.125em rgba(0, 123, 255, 0.12) !important;
 }
 
 /* Dropdown content (hidden by default) */
@@ -92,6 +141,8 @@
 .show {
   max-height: 600px; /* plenty of room */
 }
+
+
 
 /* Each item inside */
 .dropdownItem {
@@ -113,7 +164,52 @@
   border-bottom: none;
 }
 
+.buttons {
+  display: flex;          
+  gap: 1rem;               
+  justify-content: center; 
+  margin-top: 1.5rem;      
+}
+/* Minimal link-style button */
+.linkButton {
+  --btn-color: #0b6bcb;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--btn-color);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  display: inline-flex;    
+  align-items: center; 
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: color 160ms ease, transform 120ms ease;
+}
 
+.linkButton:hover {
+  color: #0a5db0;
+  transform: translateX(1px);
+}
+
+.arrow {
+  transition: transform 160ms ease;
+}
+
+.leftArrow {
+  transform: rotate(180deg); /* rotates arrow to point left */
+}
+
+.linkButton:hover .arrow {
+  transform: translateX(2px);
+}
+
+
+.scroll{
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px gray;
+}
 
 
 @keyframes pulseFade {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import "bulma/css/bulma.min.css";
 import { Candidate } from "@/interfaces/CandidateInterface";
 import { News } from "@/interfaces/News";
@@ -9,41 +9,27 @@ import s from "./noticias.module.css";
 
 
 export default function Noticias(){
-    const [candidates, setCandidates] = useState<Candidate[]>([])
     const [news, setNews] = useState<News[]>([])
-    const [TIME, setTime] = useState("")
 
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const currentNews = 3
-    const [visibleNews, setVisibleNews] = useState(currentNews)
-    const [newsLength, setNewsLength] = useState(0)
+    const [currentPage, setCurrentPage] = useState(0)
+    const [filteredNews, setFilteredNews] = useState<News[]>([])
+    
 
     function formatNews(news: News[], candidates: Candidate[]) {
         return news.map(n => {
             const candidate = candidates.find(c => c.id === n.id);
             return {
             ...n,
-            name: candidate?.name, 
+            name: candidate?.name.normalize('NFD').replace(/[\u0300-\u036f]/g, ''), 
             };
         });
     }
 
-    function updateCurrentNewsVisibility() {
-        if (visibleNews < newsLength){
-            const news = visibleNews + currentNews
-            setVisibleNews(news)
-        }
-        
-    }
-
-    function previousPage() {
-        if (visibleNews >= 0){
-            const news = visibleNews - currentNews
-            setVisibleNews(news)
-        }
-    }
 
     const loadData = async () => {
         if (!apiUrl) {
@@ -69,8 +55,6 @@ export default function Noticias(){
             const newslist = (newsdata ?? []) as News[];
 
             const newsformat = formatNews(newslist,list)
-            setNewsLength(newslist.length)
-            setCandidates(list);
             setNews(newsformat)
 
         } catch (err: any) {
@@ -81,17 +65,10 @@ export default function Noticias(){
       };
 
 
-//add candidates with news at the top
-useEffect(() => {
-        loadData();
-        console.log(news)
-  }, []);
-
-   useEffect(() => {
-    if (news) {
-      console.log('Updated API data in state:', news); // Log after state update
-    }
-  }, [news]); // Run when apiData changes
+    //add candidates with news at the top
+    useEffect(() => {
+            loadData();
+    }, []);
 
     const [openIndex, setOpenIndex] = useState(-1)
 
@@ -99,6 +76,80 @@ useEffect(() => {
     setOpenIndex(openIndex === i ? -1 : i);
   };
 
+   const [query, setQuery] = useState("");
+
+
+    const totalPages = Math.ceil(filteredNews.length / currentNews)
+    const start = currentPage * currentNews
+    const end = start + currentNews
+    const visibleNews = filteredNews.slice(start, end)
+
+    useEffect(() => {
+        setOpenIndex(-1);
+    }, [currentPage]);
+
+    const nextPage = () => {
+        if (currentPage < totalPages - 1) {
+        setCurrentPage(currentPage + 1)
+        
+        }
+    }
+
+    const previousPage = () => {
+        if (currentPage > 0) {
+        setCurrentPage(currentPage - 1)
+        }
+    }
+
+   useEffect(() => {
+        const q = query.toLowerCase()
+        const f = news.filter((c)=>{
+            return c.name?.toLowerCase().includes(q)
+        })
+        setFilteredNews(f)
+        setCurrentPage(0);
+
+    }, [news,query]);
+
+
+
+   if (loading) {
+    return (
+      <section className={`section ${s.pageBg}`}>
+        <div className="container">
+          <div className={`hero ${s.heroSoft}`}>
+            <div className="hero-body py-5">
+              <h1 className="title is-4 mb-1">Noticias</h1>
+              <p className="subtitle is-6 has-text-grey">Cargando información…</p>
+            </div>
+          </div>
+
+          <div className={`mt-5 ${s.grid}`}>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className={s.skeletonCard} />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <section className="section">
+        <div className="container">
+          <div className="notification is-danger is-light">
+            <p className="mb-3"><strong>Ocurrió un problema</strong></p>
+            <p className="mb-4">{error}</p>
+            <button className="button is-danger is-light">
+              Reintentar
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  } 
   return (
     <section className={s.pageBg}>
       <div className="container">
@@ -108,25 +159,66 @@ useEffect(() => {
             <div className={s.heroRow}>
               <div>
                 <h1 className="title is-3 mb-1">Noticias Semanales</h1>
-                <p className="subtitle is-6 has-text-grey">
+                <p className="subtitle is-6 has-text-grey mt-2">
                   Explora las noticias semanales de cada candidato
                 </p>
               </div>
             </div>
           </div>
         </div>
+        {/* CONTROLS */}
 
+        <div className={`box ${s.filtersBox} mt-5`}>
+                  <div className="columns is-variable is-4 is-multiline">
+                    <div className="column is-12-mobile is-7-tablet">
+                      <div className="field">
+                        <div className="control has-icons-left">
+                          <input
+                            className={`input ${s.input}`}
+                            type="text"
+                            placeholder="Buscar por nombre"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            aria-label="Buscar"
+                          />
+                          <span className="icon is-small is-left">
+                            <i className="fas fa-search" aria-hidden="true"></i>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+        </div>
+         {/* GRID */}
+        {visibleNews.length === 0 ? (
+          <div className="box has-text-centered">
+            <p className="title is-5 mb-2">No se encontraron noticias del candidato</p>
+            <p className="has-text-grey mb-4">
+              Intenta limpiar los filtros o utiliza otro término de búsqueda.
+            </p>
+            <button
+              className="button is-light"
+              onClick={() => {
+                setQuery("");
+              }}
+            >
+              Limpiar filtros
+            </button>
+          </div>
+        ) : (
         <ul className={s.grid} role="list">
-          {news?.slice(visibleNews - currentNews, visibleNews).map((n, i) => (
-            <li key={i} className={s.gridItem} role="listitem">
+          {visibleNews.map((n, i) => (
+            <li key={n.id} className={s.gridItem} role="listitem">
               <div className={s.dropdown}>
                 <button
                   className={s.dropdownHeader}
                   onClick={() => toggle(i)}
                 >
-                  <span>{n.name}</span>
+                
+                <span className={s.name}>{n.name} </span>
+                
+                <div className={s.extraItems}>
                   <span className={s.count}>{n.news.length}</span>
-
                   <span
                     className={`${s.caret} ${
                       openIndex === i ? s.open : ""
@@ -134,6 +226,8 @@ useEffect(() => {
                   >
                     +
                   </span>
+                </div>
+                 
                 </button>
 
                 <div
@@ -141,25 +235,40 @@ useEffect(() => {
                     openIndex === i ? s.show : ""
                   }`}
                 >
-                  {n.news?.map((item, j) => (
+                    <div className={s.scroll}>
+                    {n.news?.map((item, j) => (
                     <a key={j} href={item.link} className={s.dropdownItem}>
                       {item.title}
                     </a>
                   ))}
+                    </div>
+                 
                 </div>
               </div>
             </li>
           ))}
-        </ul>
-        <div>
-            {visibleNews > 3 && (
-            <button onClick={previousPage}>Anterior</button>
-        )}
-          {visibleNews < news.length && (
-        <button onClick={updateCurrentNewsVisibility}>Siguiente </button>
-        )}
-        </div>
+        </ul>)}
+
+        {/* BUTTONS */}
+        <div className={s.buttons}>
+           
+                    <button
+                    className={s.linkButton}
+                    onClick={previousPage}
+                    disabled={currentPage === 0}
+                    >
+                &larr; Anterior
+                </button>
         
+         
+                <button
+                    className={s.linkButton}
+                    onClick={nextPage}
+                    disabled={currentPage >= totalPages - 1}
+                    >
+                Siguiente &rarr;
+                </button>
+        </div>
       </div>
     </section>
   );

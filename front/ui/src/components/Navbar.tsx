@@ -12,6 +12,7 @@ const navItems = [
   { href: "/parties", label: "Partidos" },
   { href: "/noticias", label: "Noticias" },
   { href: "/dashboard", label: "Tendencias" },
+  
 ];
 
 export default function Navbar() {
