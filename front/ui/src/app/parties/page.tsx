@@ -42,7 +42,6 @@ export default function parties(){
         !q ||
         c.name?.toLowerCase().includes(q) ||
         c.summary?.toLowerCase().includes(q);
-    //   const matchesParty = !partyFilter || String(c.party_id) === partyFilter;
       return matchesQuery 
     });
   }, [parties, query]);

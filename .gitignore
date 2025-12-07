@@ -5,4 +5,7 @@ __pycache__/
 service_key_gc.json
 Pipfile
 Pipfile.lock
+front/ui/package-lock.json
+front/ui/package.json
+src/__pycache__/
 package-lock.json
