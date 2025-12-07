@@ -178,3 +178,9 @@ body {
     color: #363636; 
     font-weight: 600; /* Ensure it's bold */
 }
+
+html body strong,
+html body b,
+html body .has-text-weight-bold {
+  color: #122b46 !important; /* or whatever dark text color you use */
+}

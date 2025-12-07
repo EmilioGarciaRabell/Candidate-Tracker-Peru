@@ -15,6 +15,8 @@ const navItems = [
   { href: "/metodologias", label: "Metodologías" },
   { href: "/faq", label: "Preguntas Frequentes" },
   { href: "/about", label: "Acerca de" },
+  { href: "/contact", label: "Contactanos" },
+  
   
 ];
 

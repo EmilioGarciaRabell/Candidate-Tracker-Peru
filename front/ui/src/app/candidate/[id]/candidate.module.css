@@ -338,81 +338,168 @@
 
 
 /* 📱 MOBILE RESPONSIVE DESIGN */
+/* 📱 MOBILE RESPONSIVE DESIGN – phones */
 @media (max-width: 768px) {
+  /* Overall card */
   .profile_container {
     flex-direction: column;
     width: 100%;
-    margin: 10px auto;
-    padding: 15px;
+    margin: 12px auto;
+    padding: 14px;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
   }
 
+  /* Sidebar stacks on top */
   .profile_sidebar {
     width: 100%;
-    padding: 20px;
+    padding: 16px;
     border-right: none;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #e5e5e5;
+    background: #fafafa;
   }
 
+  .profile_pic {
+    margin-bottom: 18px;
+  }
+
+  /* Main details below */
   .profile_details {
-    padding: 20px;
+    padding: 16px;
   }
 
+  .profile_details h2 {
+    font-size: 1.4rem;
+  }
+
+  .job_title {
+    margin-bottom: 14px;
+  }
+
+  /* Sections: reduce spacing + padding */
   .background_section,
   .antecedentes_section,
+  .public_opinion_section,
   .social_section {
-    padding: 15px;
-    margin: 20px 0;
+    margin: 18px 0;
+    padding: 14px;
   }
 
-  .work_section h3,
+  .background_section {
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  }
+
+  .background_section h3,
   .antecedentes_section h3,
+  .public_opinion_section h3,
   .social_section h3,
-  .background_section h3 {
-    font-size: 1.25rem;
+  .work_section h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
   }
 
+  .background_section h3::after,
+  .antecedentes_section h3::after,
+  .public_opinion_section h3::after,
+  .social_section h3::after,
+  .work_section h3::after {
+    margin-left: 10px;
+  }
+
+  /* Work / experience */
   .experience_list strong {
-    font-size: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .experience_list p {
+    font-size: 0.9rem;
+  }
+
+  /* Antecedentes list shorter and more compact */
+  .antecedente_list {
+    max-height: none;
+    padding-right: 0;
+    gap: 12px;
   }
 
   .antecedente_item {
-    padding: 12px 15px;
+    padding: 12px 14px;
+    border-radius: 8px;
+  }
+
+  .antecedente_item h4 {
+    font-size: 1rem;
   }
 
   .antecedente_item p {
     font-size: 0.9rem;
   }
 
+  /* Sentiment bar */
+  .sentiment_bar {
+    border-radius: 6px;
+  }
+
+  .segment {
+    font-size: 0.78rem;
+    padding: 7px 0;
+  }
+
+  .sentiment_note {
+    font-size: 0.85rem;
+  }
+
+  /* Social links as full-width buttons */
   .social_links {
     flex-direction: column;
     align-items: stretch;
   }
 
   .social_links a {
-    justify-content: center;
+    justify-content: flex-start;
   }
 
-  .btn {
-    width: 100%;
-    text-align: center;
+  /* Tabs / navBar */
+  .navBar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0.5rem;
+    padding-bottom: 0.4rem;
+    margin: 1rem 0;
   }
 
-  .nav_bar {
-    gap: 10px;
-    justify-content: center;
-  }
-
-    .segment {
-    font-size: 0.75rem;
-    padding: 8px 0;
-  }
-  .poll_list li {
+  .navItem {
+    white-space: nowrap;
+    padding: 0.5rem 0.75rem;
     font-size: 0.9rem;
   }
-  .mention_item {
-    padding: 12px 15px;
+
+  /* Soft components on small screens */
+  .heroSoft { border-radius: 12px; }
+  .cardSoft { border-radius: 12px !important; }
+  .boxSoft  { border-radius: 10px !important; }
+
+  /* Social cards grid — feel like a single column */
+  .socialGrid {
+    gap: 0.6rem;
+  }
+
+  .socialLink {
+    padding: 0.7rem 0.8rem;
+  }
+
+  /* References grid -> single column */
+  .refsGrid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .refCard {
+    padding: 0.9rem;
   }
 }
+
 
 
 

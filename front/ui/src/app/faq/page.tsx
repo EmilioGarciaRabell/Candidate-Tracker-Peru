@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import styles from "./faq.module.css";
 
 export default function FAQPage() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const faqs = [
     {
@@ -49,44 +50,51 @@ export default function FAQPage() {
   ];
 
   return (
-    <section className="section py-4 px-3">
+    <section className={`section ${styles.faqSection}`}>
       <div className="container is-max-desktop">
 
-        {/* Título */}
-        <div className="has-text-centered mb-4">
-          <h1 className="title is-2 has-text-weight-bold has-text-primary-dark mb-2">
-            Preguntas Frecuentes
-          </h1>
+        <div className={styles.header}>
+          <h1 className="title is-2 has-text-weight-bold">Preguntas Frecuentes</h1>
           <p className="subtitle is-6 has-text-grey">
-            Todo lo que necesitas saber sobre la plataforma
+            Encuentra respuestas rápidas sobre el funcionamiento de la plataforma
           </p>
         </div>
 
-        {/* Acordeón pegadito */}
-        <div className="accordion">
-          {faqs.map((faq, index) => (
-            <article
-              key={index}
-              className={`message is-medium mb-2 faq-item ${openIndex === index ? "is-open" : ""}`}
-              onClick={() => setOpenIndex(openIndex === index ? null : index)}
-            >
-              <div className="message-header has-background-info-light p-4">
-                <p className="has-text-weight-bold has-text-black is-size-5">
-                  {index + 1}. {faq.q}
-                </p>
-                <span className="icon">
-                  <i className={`fas fa-chevron-${openIndex === index ? "up" : "down"} fa-lg`}></i>
-                </span>
-              </div>
-              <div className="message-body p-4 has-background-white-bis">
-                <div className="content has-text-black-bis">
-                  {faq.a.split("\n\n").map((p, i) => (
-                    <p key={i} className="mb-3">{p}</p>
-                  ))}
+        <div className={styles.accordionWrapper}>
+          {faqs.map((faq, index) => {
+            const isOpen = openIndex === index;
+
+            return (
+              <article
+                key={index}
+                className={`${styles.faqItem} ${isOpen ? styles.faqItemOpen : ""}`}
+              >
+                <button
+                  type="button"
+                  className={styles.faqHeader}
+                  onClick={() => setOpenIndex(isOpen ? null : index)}
+                >
+                  <span className={styles.questionText}>{faq.q}</span>
+                  <span
+                    className={`${styles.chevron} ${
+                      isOpen ? styles.chevronOpen : ""
+                    }`}
+                  />
+                </button>
+
+                <div
+                  className={styles.faqBody}
+                  style={{ maxHeight: isOpen ? "400px" : "0px" }}
+                >
+                  <div className={styles.faqBodyInner}>
+                    {faq.a.split("\n\n").map((p, i) => (
+                      <p key={i} className={styles.answerParagraph}>{p}</p>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
 
       </div>

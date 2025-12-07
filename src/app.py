@@ -5,6 +5,7 @@ from src.routes.main_routes import main_bp
 from src.routes.candidate_page import candidate_bp
 from src.routes.google_cloud_storage import google_storage_bp
 from src.routes.parties_routes import PARTY
+from src.routes.comparison_tool import comparison_bp
 
 def create_app():
     app = Flask(__name__)
@@ -18,7 +19,7 @@ def create_app():
     app.register_blueprint(candidate_bp)
     app.register_blueprint(google_storage_bp)
     app.register_blueprint(PARTY)
-
+    app.register_blueprint(comparison_bp)
     for rule in app.url_map.iter_rules():
         print(rule, rule.endpoint)
     return app
