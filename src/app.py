@@ -10,6 +10,7 @@ import pytz
 
 from src.routes.google_cloud_storage import google_storage_bp
 from src.routes.parties_routes import PARTY
+from src.routes.comparison_tool import comparison_bp
 
 def create_app():
     app = Flask(__name__)
@@ -24,7 +25,7 @@ def create_app():
     app.register_blueprint(news_bp)
     app.register_blueprint(google_storage_bp)
     app.register_blueprint(PARTY)
-
+    app.register_blueprint(comparison_bp)
  
     return app
 

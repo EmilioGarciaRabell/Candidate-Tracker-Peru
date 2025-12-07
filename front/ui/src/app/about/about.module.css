@@ -1,0 +1,347 @@
+.pageWrapper {
+  background-color: #f7f9fc;
+}
+
+/* Hero */
+
+.heroSection {
+  padding-top: 5rem;
+  padding-bottom: 4rem;
+  background: radial-gradient(circle at top left, #e2f0ff 0, #f7f9fc 45%, #ffffff 100%);
+}
+
+.heroContent {
+  max-width: 780px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.heroEyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1d4f91;
+  margin-bottom: 0.75rem;
+}
+
+.heroTitle {
+  color: #122b46;
+  margin-bottom: 1.25rem;
+  line-height: 1.15;
+}
+
+.heroSubtitle {
+  color: #4a5970;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Breadcrumb */
+
+.breadcrumbWrapper {
+  max-width: 780px;
+  margin: 0 auto 1.5rem auto;
+}
+
+.breadcrumb {
+  font-size: 0.85rem;
+  color: #6f7b8f;
+}
+
+.breadcrumbLink {
+  color: #3273dc;
+  text-decoration: none;
+}
+
+.breadcrumbLink:hover {
+  text-decoration: underline;
+}
+
+.breadcrumbSeparator {
+  margin: 0 0.25rem;
+}
+
+.breadcrumbCurrent {
+  color: #9aa3b5;
+}
+
+/* Story / main sections */
+
+.storySection {
+  background-color: #f7f9fc;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.sectionTitle {
+  color: #122b46;
+}
+
+.leadParagraph {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #3e4a5d;
+  margin-bottom: 1.25rem;
+}
+
+.bodyParagraph {
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: #4b5668;
+  margin-bottom: 0.9rem;
+}
+
+.textLink {
+  color: #3273dc;
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.textLink:hover {
+  opacity: 0.9;
+}
+
+/* Highlight card on the right */
+
+.highlightCard {
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 1.75rem 1.5rem;
+  box-shadow: 0 18px 45px rgba(20, 60, 120, 0.08);
+  border: 1px solid #e5ecf7;
+}
+
+.highlightLabel {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #1d4f91;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.highlightList {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.highlightList li {
+  position: relative;
+  padding-left: 1.4rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: #3f4b61;
+}
+
+.highlightList li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.6rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: #3273dc;
+}
+
+/* Alt background section */
+
+.altSection {
+  background-color: #ffffff;
+  padding-top: 3.5rem;
+  padding-bottom: 3.5rem;
+  border-top: 1px solid #e4ebf6;
+  border-bottom: 1px solid #e4ebf6;
+}
+
+/* Pill label */
+
+.pillLabel {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: #e4f0ff;
+  color: #1d4f91;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+
+/* Story grid section */
+
+.storyGridSection {
+  padding-top: 3.5rem;
+  padding-bottom: 3.5rem;
+  background-color: #f7f9fc;
+}
+
+.sectionIntro {
+  max-width: 680px;
+  margin: 0 auto 2.5rem auto;
+  text-align: center;
+}
+
+.sectionIntroText {
+  font-size: 0.98rem;
+  color: #4b5668;
+  margin-top: 0.75rem;
+}
+
+.storyCard {
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 1.75rem 1.5rem;
+  border: 1px solid #e4ebf6;
+  box-shadow: 0 10px 24px rgba(15, 50, 95, 0.06);
+  height: 100%;
+}
+
+.cardTitle {
+  margin-bottom: 1rem;
+}
+
+/* Meta callout inside card */
+
+.metaCallout {
+  margin-top: 1.25rem;
+  padding: 0.9rem 1rem;
+  border-radius: 0.75rem;
+  background: #f0f5ff;
+}
+
+.metaLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1d4f91;
+  margin-bottom: 0.25rem;
+}
+
+.metaText {
+  font-size: 0.9rem;
+  color: #3f4b61;
+}
+
+/* Closing section */
+
+.closingSection {
+  padding-top: 3rem;
+  padding-bottom: 4rem;
+  background: #ffffff;
+}
+
+.closingCard {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 2.25rem 2rem;
+  border-radius: 1.25rem;
+  background: linear-gradient(135deg, #e4f0ff 0%, #ffffff 65%);
+  border: 1px solid #d7e5ff;
+  box-shadow: 0 18px 40px rgba(20, 60, 120, 0.12);
+}
+
+.closingEyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1d4f91;
+  margin-bottom: 0.5rem;
+}
+
+.closingTitle {
+  color: #122b46;
+  margin-bottom: 0.75rem;
+}
+
+.closingText {
+  font-size: 0.98rem;
+  color: #3f4b61;
+}
+
+/* Responsive tweaks */
+
+@media screen and (max-width: 1024px) {
+  .heroSection {
+    padding-top: 4rem;
+    padding-bottom: 3rem;
+  }
+
+  .storySection,
+  .altSection,
+  .storyGridSection {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .highlightCard {
+    margin-top: 2rem;
+  }
+}
+
+/* MOBILE – phones */
+@media (max-width: 768px) {
+  .contactSection {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .cardWrapper {
+    padding: 1.75rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+    margin: 0 0.5rem;         /* breathing room from screen edges */
+  }
+
+  .leftPane {
+    margin-bottom: 1.75rem;   /* space between text and form */
+  }
+
+  .title {
+    font-size: 1.7rem;        /* scale down heading slightly */
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  /* Form column: remove vertical divider & padding */
+  .form {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  /* Two name inputs stack vertically instead of side-by-side */
+  .form .columns {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .form .column {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* Helper + button: stack vertically */
+  .footerRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+  }
+
+  .helperText {
+    text-align: left;
+  }
+
+  .submitButton {
+    width: 100%;
+  }
+}

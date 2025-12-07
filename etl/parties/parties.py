@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import psycopg2
 from psycopg2 import sql
 load_dotenv()
-BASE_URL = "https://rpp.pe/politica/elecciones/elecciones-2026-conoce-cuales-son-los-partidos-politicos-inscritos-y-los-que-estan-en-proceso-de-inscripcion-noticia-1572877"
+BASE_URL = "https://www.gob.pe/institucion/onpe/noticias/1265509-onpe-37-organizaciones-politicas-elegiran-candidatos-via-delegados-y-solo-2-lo-haran-de-manera-directa-via-afiliados"
 
 def fetch_page(url):
     res = requests.get(url)
@@ -17,7 +17,7 @@ def fetch_page(url):
 
 def find_ol(html):
     soup = BeautifulSoup(html, "lxml")
-    ol_tag = soup.find("ol")
+    ol_tag = soup.find_all("ol")[1]
     return ol_tag
 
 def format_names_list_from_ol(data):
@@ -27,7 +27,8 @@ def format_names_list_from_ol(data):
 
         for item in items:
      
-            name = item.lower().split("fecha de inscripción")[0].strip()
+            # name = item.lower().split("fecha de inscripción")[0].strip()
+            name = item.lower().strip()
             parties.append({"name": name})
         return parties
 
@@ -46,6 +47,28 @@ def get_wiki_link(party_name):
     else:
         return None
 
+
+def get_party_website(party_name):
+    query = f'{party_name} sitio oficial OR página oficial OR web oficial'
+    params = {
+        "engine": "google",
+        "q": query,
+        "api_key": os.environ.get("SERAPI"),
+        "hl": "es",
+        "num": 5
+    }
+
+    search = GoogleSearch(params)
+    results = search.get_dict().get("organic_results", [])
+
+    # Try to find a .pe domain or official-looking URL
+    for r in results:
+        link = r.get("link", "")
+        if any(ext in link for ext in [".pe", ".org", ".com", ".org.pe"]):
+            return link
+
+    # fallback if nothing matches
+    return results[0].get("link") if results else None
 
 def get_party_info(wiki_link):
     if not wiki_link:
@@ -153,17 +176,37 @@ def main():
     parties = format_names_list_from_ol(data)
     
     for party in parties:
-        name = party.get('name')
+        name = party.get("name")
         if not name:
             continue
+
+        # Get Wikipedia link and info
         link = get_wiki_link(name)
-        party_info = get_party_info(link) if link else {"summary": "not found", "position": "not found", "ref": "not_found"}
+        party_info = get_party_info(link) if link else {
+            "summary": "not found",
+            "position": "not found",
+            "ref": ["not_found"]
+        }
+
+        # Merge scraped info into the party dict
         if isinstance(party_info, dict):
             party.update(party_info)
-            
+            if link:
+                party["ref"] = [link]
+
+        # Get official website
+        website = get_party_website(name)
+
+        if website:
+            if party["ref"] == "not_found":
+                party["ref"] = [website]  # or "website" if you prefer a different key
+            else:
+                party["ref"].append(website)
         else:
-            # fallback if something went wrong
-            party.update({"summary": "not found", "position": "not found", "ref": "not_found"})
+            # Fallback if website lookup failed
+            party.setdefault("ref", "not_found")
+
+        # Insert into DB
         insert_into_table(party)
 
             

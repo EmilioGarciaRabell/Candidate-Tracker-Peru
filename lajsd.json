@@ -1,0 +1,22 @@
+{
+    "name":"keiko",
+    "party":"party",
+    "age":"age",
+    "education":"education",
+    "summary":"summary",
+    "ref":["references",...],
+    "controversies":
+
+        [{
+            "summary":"text",
+            "dates":"dates",
+            "source":"source"
+        },..],
+    "accomplishments":
+     [{
+            "summary":"text",
+            "dates":"dates",
+            "source":"source"
+        },..],
+
+}

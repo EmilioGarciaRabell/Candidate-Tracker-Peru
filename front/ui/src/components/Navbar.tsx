@@ -12,6 +12,12 @@ const navItems = [
   { href: "/parties", label: "Partidos" },
   { href: "/noticias", label: "Noticias" },
   { href: "/dashboard", label: "Tendencias" },
+  { href: "/metodologias", label: "Metodologías" },
+  { href: "/faq", label: "Preguntas Frequentes" },
+  { href: "/about", label: "Acerca de" },
+  { href: "/contact", label: "Contactanos" },
+  
+  
   
 ];
 
@@ -79,11 +85,7 @@ export default function Navbar() {
             </div>
 
             <div className="navbar-end">
-              <div className="navbar-item">
-                <Link href="/explore" className={styles.cta} onClick={() => setOpen(false)}>
-                  Explora ahora
-                </Link>
-              </div>
+              
             </div>
           </div>
         </div>

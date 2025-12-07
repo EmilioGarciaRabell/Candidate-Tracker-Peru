@@ -6,6 +6,7 @@ import PublicOpinionSection from "./PublicOpinionSection";
 import profilePicture from "./profile.jpg";
 import styles from "./candidate.module.css";
 import "bulma/css/bulma.min.css";
+import DOMPurify from 'dompurify';
 
 /* ===== Socials Types & Helpers (NEW) ===== */
 type SocialsApi = {
@@ -18,6 +19,23 @@ type SocialsApi = {
   linkedin?: string;
   threads?: string;
   website?: string;
+};
+
+type StructuredItem = {
+    // Título del puesto o grado (e.g., "Ingeniero Civil", "Jefe de Departamento")
+    title: string; 
+    // Nombre de la institución o empresa (e.g., "Universidad Nacional", "Ministerio de Hacienda")
+    institution: string; 
+    // Lugar o ciudad (opcional, puede ser "not_found" o null)
+    place?: string; 
+    // Periodo de tiempo (e.g., "2015 - 2020", "Actualidad")
+    time: string;
+};
+
+// Estructura del objeto JSON completo que se recibe de la DB
+type StructuredData = {
+    "Experiencia Laboral"?: StructuredItem[];
+    "Educacion"?: StructuredItem[];
 };
 
 type SocialLink = { platform: string; url: string; handle?: string };
@@ -35,6 +53,10 @@ function handleFromUrl(url: string): string | undefined {
   } catch {
     return undefined;
   }
+}
+
+function isStructuredData(data: any): data is StructuredData {
+    return typeof data === 'object' && data !== null && !Array.isArray(data);
 }
 
 function normalizeToArray(obj: SocialsApi | null | undefined): SocialLink[] {
@@ -104,7 +126,7 @@ export default function CandidatePage() {
         if (!res.ok) throw new Error("Fetch failed");
         const data = await res.json();
         if (!cancelled) setCandidate(data.candidate ?? null);
-        
+        console.log(data.candidate)
       } catch {
         if (!cancelled) setCandidate(null);
       } finally {
@@ -170,8 +192,18 @@ useEffect(() => {
   };
 }, [id, apiUrl]);
 
+    const renderHtmlContent = (htmlContent: string) => {
+    // Sanitize the HTML to remove any potential malicious scripts
+    const cleanHtml = DOMPurify.sanitize(htmlContent);
 
-
+    return (
+        <div
+            className="content-display has-text-grey"
+            dangerouslySetInnerHTML={{ __html: cleanHtml }}
+        />
+    );
+};
+  
   const tabs = [
     ["historia", "Historia"],
     ["educacion", "Educacion"],
@@ -182,6 +214,54 @@ useEffect(() => {
     // ["redes", "Redes Sociales"],
     ["referencias","Referencias"]
   ] as const;
+ 
+const renderStructuredContent = (
+  data: any,
+  key: "Educacion" | "Experiencia Laboral"
+) => {
+  const items: StructuredItem[] = isStructuredData(data) ? data[key] || [] : [];
+
+  if (!items.length) {
+    return <p className="text-gray-500 text-lg">No hay información disponible.</p>;
+  }
+
+  return (
+    <div className="flex flex-col space-y-8 mt-6">
+      {items.map((item, index) => (
+        <div
+          key={`${key}-${index}`}
+          className="border-l-4 border-gray-300 pl-5 group"
+        >
+          {/* Título */}
+          <h4 className="font-extrabold text-xl text-gray-800 group-hover:text-gray-900 transition">
+            {item.title}
+          </h4>
+
+          {/* Institución */}
+          <p className="text-base text-gray-700 mb-1">
+            {item.institution}
+          </p>
+
+          {/* Lugar – Fechas */}
+          <p className="text-base text-gray-500 flex items-center gap-2">
+            {item.place && item.place !== "not_found" && (
+              <>
+                <i className="fas fa-map-marker-alt text-sm"></i>
+                <span>{item.place}</span>
+                <span>•</span>
+              </>
+            )}
+            <span>{item.time}</span>
+          </p>
+
+          {/* Separador */}
+          <div className="mt-5 border-b border-gray-200"></div>
+        </div>
+      ))}
+    </div>
+  );
+};
+  
 
 
   if (loading) {
@@ -215,6 +295,7 @@ useEffect(() => {
       </section>
     );
   }
+
 
   return (
     <section className={`section ${styles.pageBg}`}>
@@ -316,9 +397,6 @@ useEffect(() => {
                     </ul>
                   )}
                 
-                
-
-
               </div>
             </div>
           </aside>
@@ -347,26 +425,39 @@ useEffect(() => {
             <div className={`box ${styles.boxSoft}`} id={`panel-${activeTab}`} role="tabpanel">
               {activeTab === "historia" && (
                 <>
-                  <h3 className="title is-5">Acerca de mí</h3>
+                  <h3 className="title is-5">Acerca de</h3>
                   <p className="content">{candidate.summary ?? "No hay información disponible."}</p>
                 </>
               )}
 
               {activeTab === "educacion" && (
                 <>
-                  <h3 className="title is-5">Educacion</h3>
-                <div className={styles.subtleDivider} />
-                  <p className="has-text-grey">{candidate.education ?? "No hay informacion disponible"}</p>
+                    <h3 className="title is-5">Educacion</h3>
+                    <div className={styles.subtleDivider} />
+                    
+                    {/* Check if education is a truthy string AND is not "not_found" */}
+                    {candidate.education && candidate.education !== "not_found" ? ( 
+                        renderStructuredContent(candidate.education, "Educacion")
+                    ) : (
+                        <p className="has-text-grey">No hay información disponible</p>
+                    )}
                 </>
-              )}
+)}
 
-              {activeTab === "experienciaLaboral" && (
+            {activeTab === "experienciaLaboral" && (
                 <>
-                  <h3 className="title is-5">Experiencia Laboral</h3>
-                <div className={styles.subtleDivider} />
-                  <p className="has-text-grey">{candidate.work_experience ?? "No hay informacion disponible"}</p>
+                    <h3 className="title is-5">Experiencia Laboral</h3>
+                    <div className={styles.subtleDivider} />
+                    
+                    {/* Llama a la función de renderizado estructurado para "Experiencia Laboral" */}
+                    {/* Verifica que exista el contenido y que no sea el string literal de "not_found" */}
+                    {candidate.work_experience && candidate.work_experience !== "not_found" ? ( 
+                        renderStructuredContent(candidate.work_experience, "Experiencia Laboral")
+                    ) : (
+                        <p className="has-text-grey">No hay información disponible</p>
+                    )}
                 </>
-              )}
+            )}
 
               {activeTab === "polemicas" && (
                 <>
@@ -406,6 +497,7 @@ useEffect(() => {
                     <div key={i} className={styles.refCard}>
                       <blockquote className={styles.refQuote}>
                         “{ref.quote}”
+                        
                       </blockquote>
 
                       <a
@@ -416,6 +508,7 @@ useEffect(() => {
                       >
                         Ver fuente →
                       </a>
+                      <p>{ref.category}</p>
                     </div>
                   ))}
                 </div>

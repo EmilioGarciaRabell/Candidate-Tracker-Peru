@@ -1,6 +1,7 @@
 export interface CandidateRef {
   quote: string;
   link: string;
+  category: string;
 }
 
 export type CandidateRefs = CandidateRef[];  // <-- Array, not dictionary
@@ -17,4 +18,5 @@ export interface Candidate {
     work_experience: string;
     polemicas: string;
     education : string;
+    nicknames: string[]; 
 }

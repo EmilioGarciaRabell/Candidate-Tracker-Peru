@@ -238,3 +238,92 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* 📱 MOBILE – phones */
+@media (max-width: 768px) {
+  .background {
+    padding: 1.75rem 0 2.25rem;
+  }
+
+  .shell {
+    padding-inline: 1rem;
+  }
+
+  .hero {
+    gap: 1.5rem;
+  }
+
+  .copy {
+    gap: 0.9rem;
+  }
+
+  .kicker {
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+  }
+
+  .title {
+    font-size: 1.8rem; /* clamp is fine but this keeps it from getting too huge */
+    line-height: 1.15;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    max-width: 100%;
+  }
+
+  /* CTAs: stacked and easier to tap */
+  .ctaRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+    margin-top: 0.25rem;
+  }
+
+  .ctaPrimary,
+  .ctaGhost {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Badges wrap nicely */
+  .badges {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.22rem 0.55rem;
+  }
+
+  /* Illustration card: lighter on mobile */
+  .imageWrap {
+    order: -1;              /* put image first if you prefer hero visual on top */
+    margin-bottom: 0.75rem;
+  }
+
+  .imageCard {
+    padding: 0.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 22px rgba(16, 24, 40, 0.06);
+  }
+
+  .heroImg {
+    border-radius: 10px;
+  }
+
+  /* Quick links: full-width list style */
+  .quickLinks {
+    margin-top: 2rem;
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .qLink {
+    padding: 0.8rem 0.9rem;
+    font-size: 0.95rem;
+    box-shadow: 0 6px 16px rgba(16, 24, 40, 0.05);
+  }
+}

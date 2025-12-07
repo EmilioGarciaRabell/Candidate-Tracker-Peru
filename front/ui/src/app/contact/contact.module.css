@@ -1,0 +1,238 @@
+.contactSection {
+  background-color: #ffffff;
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+/* Card container */
+.cardWrapper {
+  max-width: 1080px;
+  margin: 0 auto;
+  border-radius: 14px;
+  background-color: #ffffff;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+  padding: 3rem 3.5rem;
+}
+
+/* Left column */
+.leftPane {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #3b82f6; /* Blue accent */
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  color: #1e293b; /* Clean dark blue-gray */
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: #475569;
+  line-height: 1.55;
+  margin-bottom: 1.75rem;
+}
+
+.infoLabel {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.1em;
+}
+
+.infoLink {
+  font-size: 0.95rem;
+  color: #3b82f6;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.infoText {
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+/* FORM SECTION */
+
+.form {
+  border-left: 1px solid #e2e8f0;
+  padding-left: 2.5rem;
+}
+
+/* Labels */
+.label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155; /* Dark gray-blue */
+}
+
+/* Inputs — clean modern style */
+.input,
+.textarea {
+  border-radius: 6px;
+  border: 1px solid #cbd5e1 !important; /* Soft gray border */
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  box-shadow: none !important;
+  font-size: 0.95rem;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:hover,
+.textarea:hover {
+  border-color: #94a3b8 !important; /* Slight darker gray */
+}
+
+/* Blue focus */
+.input:focus,
+.textarea:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 1.8px rgba(59, 130, 246, 0.35) !important;
+}
+
+/* Submit Row */
+.footerRow {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.helperText {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+/* Submit button — BLUE, modern */
+.submitButton {
+  min-width: 130px;
+  background-color: #2563eb !important; /* Deep blue */
+  color: white !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  border: none !important;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.submitButton:hover {
+  background-color: #1e40af !important; /* Darker blue */
+  transform: translateY(-1px);
+}
+
+.submitButton:active {
+  transform: translateY(0px);
+}
+
+/* Mobile */
+@media screen and (max-width: 1024px) {
+  .form {
+    border-left: none;
+    padding-left: 0;
+    margin-top: 2rem;
+  }
+}
+
+/* MOBILE – phones */
+@media (max-width: 768px) {
+  .contactSection {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .cardWrapper {
+    padding: 1.75rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+    margin: 0 0.5rem;         /* breathing room from screen edges */
+  }
+
+  .leftPane {
+    margin-bottom: 1.75rem;   /* space between text and form */
+  }
+
+  .title {
+    font-size: 1.7rem;        /* scale down heading slightly */
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  /* Form column: remove vertical divider & padding */
+  .form {
+    border-left: none;
+    padding-left: 0;
+  }
+
+  /* Two name inputs stack vertically instead of side-by-side */
+  .form .columns {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .form .column {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* Helper + button: stack vertically */
+  .footerRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+  }
+
+  .helperText {
+    text-align: left;
+  }
+
+  .submitButton {
+    width: 100%;
+  }
+}
+
+
+
+/* Stronger placeholder color */
+.input::placeholder,
+.textarea::placeholder {
+  color: #64748b !important;   /* Medium gray-blue */
+  opacity: 1 !important;        /* Prevent faint display */
+}
+
+/* For Safari */
+.input::-webkit-input-placeholder,
+.textarea::-webkit-input-placeholder {
+  color: #64748b !important;
+  opacity: 1 !important;
+}
+
+/* For Firefox */
+.input::-moz-placeholder,
+.textarea::-moz-placeholder {
+  color: #64748b !important;
+  opacity: 1 !important;
+}
+
+/* For Edge */
+.input:-ms-input-placeholder,
+.textarea:-ms-input-placeholder {
+  color: #64748b !important;
+}
+
+/* For older browsers */
+.input::-ms-input-placeholder,
+.textarea::-ms-input-placeholder {
+  color: #64748b !important;
+}
