@@ -12,6 +12,10 @@ const navItems = [
   { href: "/parties", label: "Partidos" },
   { href: "/news", label: "Noticias" },
   { href: "/dashboard", label: "Tendencias" },
+  { href: "/metodologias", label: "Metodologías" },
+  { href: "/faq", label: "Preguntas Frequentes" },
+  { href: "/about", label: "Acerca de" },
+  
 ];
 
 export default function Navbar() {
