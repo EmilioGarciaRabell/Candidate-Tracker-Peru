@@ -219,10 +219,11 @@ export default function Noticias(){
                 >
                 
                 <span className={s.name}>{n.name} </span>
-                <span></span>
+                {/* <span className={s.count}>{n.news_json.length}</span> */}
                 
                 <div className={s.extraItems}>
                   
+                  <span className={s.count}>{n.news_json.length}</span>
                   <span
                     className={`${s.caret} ${
                       openIndex === i ? s.open : ""
