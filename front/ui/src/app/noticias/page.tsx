@@ -22,7 +22,7 @@ export default function Noticias(){
 
     function formatNews(news: News[], candidates: Candidate[]) {
         return news.map(n => {
-            const candidate = candidates.find(c => c.id === n.id);
+            const candidate = candidates.find(c => c.id === n.candidate_id);
             return {
             ...n,
             name: candidate?.name.normalize('NFD').replace(/[\u0300-\u036f]/g, ''), 
@@ -83,6 +83,7 @@ export default function Noticias(){
     const start = currentPage * currentNews
     const end = start + currentNews
     const visibleNews = filteredNews.slice(start, end)
+    console.log(visibleNews)
 
     useEffect(() => {
         setOpenIndex(-1);
@@ -98,6 +99,8 @@ export default function Noticias(){
     const previousPage = () => {
         if (currentPage > 0) {
         setCurrentPage(currentPage - 1)
+        console.log("noticias")
+        console.log(visibleNews)
         }
     }
 
@@ -152,7 +155,7 @@ export default function Noticias(){
   } 
   return (
     <section className={s.pageBg}>
-      <div className="container">
+      <div className="container gap-5">
         {/* HERO / HEADER */}
         <div className={`hero ${s.heroSoft}`}>
           <div className="hero-body py-5">
@@ -208,7 +211,7 @@ export default function Noticias(){
         ) : (
         <ul className={s.grid} role="list">
           {visibleNews.map((n, i) => (
-            <li key={n.id} className={s.gridItem} role="listitem">
+            <li key={n.candidate_id} className={s.gridItem} role="listitem">
               <div className={s.dropdown}>
                 <button
                   className={s.dropdownHeader}
@@ -216,9 +219,10 @@ export default function Noticias(){
                 >
                 
                 <span className={s.name}>{n.name} </span>
+                <span></span>
                 
                 <div className={s.extraItems}>
-                  <span className={s.count}>{n.news.length}</span>
+                  
                   <span
                     className={`${s.caret} ${
                       openIndex === i ? s.open : ""
@@ -236,7 +240,7 @@ export default function Noticias(){
                   }`}
                 >
                     <div className={s.scroll}>
-                    {n.news?.map((item, j) => (
+                    {n.news_json?.map((item, j) => (
                     <a key={j} href={item.link} className={s.dropdownItem}>
                       {item.title}
                     </a>

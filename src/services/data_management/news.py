@@ -75,8 +75,19 @@ def store_candidates_news(batch_time):
 def get_news():
     conn = BATCH_TABLE._get_conn()
     sql = """
-    select news_json FROM candidate_data.news_batch order by date_time desc FETCH FIRST ROW ONLY;
-    """
+                SELECT 
+                    candidate_id,
+                    json_agg(
+                        json_build_object(
+                            'title', title,
+                            'link', link,
+                            'fetch_date', fetch_date
+                        ) ORDER BY fetch_date DESC
+                    ) AS news_json
+                FROM candidate_data.candidate_news
+                WHERE fetch_date >= CURRENT_DATE - INTERVAL '7 days'
+                GROUP BY candidate_id;
+            """
     try:
             with conn.cursor() as cur:
                 cur.execute(sql)

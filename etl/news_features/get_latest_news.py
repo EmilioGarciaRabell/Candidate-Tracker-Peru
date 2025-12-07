@@ -12,8 +12,8 @@ from psycopg2.extras import Json
 
 
 
-NEWS_API = os.environ.get("CARLA_API")
-api_url = f"https://newsdata.io/api/1/archive?country=PE&apikey={NEWS_API}"
+NEWS_API = os.environ.get("NEWS_API")
+api_url = f"https://newsdata.io/api/1/latest?country=PE&apikey={NEWS_API}"
 
 def database_connection():
     database_url = os.environ.get("DATABASE_URL")
@@ -36,7 +36,7 @@ def get_all_news():
 
             while nextPage is not None:
                 page_count +=1  
-                if page_count >= 75:
+                if page_count >= 70:
                     break
                 new_url = api_url + f"&page={nextPage}"
                 response = requests.get(new_url)
@@ -94,43 +94,10 @@ def get_all(item):
             conn.close()
         return None
 
-def call_api_store_initial_news():
-    news = get_all_news()
-    ##start database connection
-    conn = database_connection()
-    cur = conn.cursor()
-    
-    current_time = datetime.now()
-    ##for each news form the structure of the table
-    ##get article_id, title, link, keywords, fetch_data
-    
-    try:
-        for n in news:
-            sql_query = sql.SQL("""
-                INSERT INTO candidate_data.all_news(id,title,link,keywords,fetch_data)
-                VALUES(%s, %s, %s,%s, %s)
-                RETURNING id;                   
-                """)
-            cur.execute(sql_query,(n["article_id"], n["title"], n["link"],n["keywords"],current_time))
-        conn.commit()
-        cur.close()
-        conn.close()
-
-    except Exception as e:
-        print("Error getting select statements:", e)
-        if conn:
-            conn.rollback()
-        if cur:
-            cur.close()
-        if conn:
-            conn.close()
-        return None
-
-
 def retrieve_results():
     conn = database_connection()
     query = """
-        select  * from candidate_data.all_news
+        select  * from candidate_data.all_news WHERE fetch_date::date = CURRENT_DATE
     """
     try:
         with conn.cursor() as cur:
@@ -184,62 +151,87 @@ def tokenize_name(names,nicknames, keywords):
             
     return False
 
-
-##script that will run every 7 days (sunday)
-def store_candidates_news():
+def fetch_store_raw_news():
+    news = get_all_news()
     conn = database_connection()
-    news = retrieve_results()
-    candidates = get_all("candidate")   
-    result = []
-    for candidate in candidates:
-        candidate_news = {      
-            "id": candidate[0],
-            "news": []
-        }
-        for n in news:
-            if n is not None and n["keywords"] is not None:
-                clean_keywords = remove_accents(n["keywords"])
-                if tokenize_name(candidate[1],candidate[9],clean_keywords):
-                    candidate_news["news"].append({"title": n["title"],"link": n["link"],"keywords":n["keywords"]})
-        result.append(candidate_news)
+    cur = conn.cursor()
     
-    current_time = datetime.now().date()
-    query = """
-        INSERT INTO candidate_data.news_batch(news_json,date_time)
-        VALUES (%s,%s)
-        """
-    query2 = """
-        INSERT INTO candidate_data.past_news
-        SELECT * FROM candidate_data.all_news
-        """
+    current_time = datetime.now()
     
-    query3 = """
-        truncate table candidate_data.all_news
-        """
     try:
-        with conn.cursor() as cur:
-                cur.execute(query,( Json(result) , current_time))
-                cur.execute(query2)
-                cur.execute(query3)
-                conn.commit()
-    finally:
+        for n in news:
+            sql_query = sql.SQL("""
+                INSERT INTO candidate_data.all_news(id,title,link,keywords,fetch_date)
+                VALUES(%s, %s, %s,%s, %s)
+                ON CONFLICT (link) DO NOTHING;                   
+                """)
+            cur.execute(sql_query,(n["article_id"], n["title"], n["link"],n["keywords"],current_time))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+    except Exception as e:
+        print("Error getting select statements:", e)
+        if conn:
+            conn.rollback()
+        if cur:
             cur.close()
+        if conn:
             conn.close()
-    return result
+        return None
+
+
+def get_daily_candidate_news():
+
+    fetch_store_raw_news()
+
+    news = retrieve_results()
+
+    ##start database connection
+    conn = database_connection()
+    cur = conn.cursor()
+    
+    current_time = datetime.now()
+    
+    ##get candidates
+    candidates = get_all("candidate") 
+    
+    try:
+        ##find news for each candidate
+        for candidate in candidates:
+            for n in news:
+                if n is not None and n["keywords"] is not None:
+                    clean_keywords = remove_accents(n["keywords"])
+                    if tokenize_name(candidate[1],candidate[9],clean_keywords):            
+                        ##insert into candidate_news table news for each candidate that day
+                        sql_query = sql.SQL("""
+                            INSERT INTO candidate_data.candidate_news(candidate_id,title,link,fetch_date)
+                            VALUES(%s, %s,%s, %s)
+                            ON CONFLICT DO NOTHING;                   
+                            """)                        
+                        cur.execute(sql_query,(candidate[0], n["title"],n["link"],current_time))
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+
+    except Exception as e:
+        print("Error getting select statements:", e)
+        if conn:
+            conn.rollback()
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+        return None
+
 
 
 def news_daily_script():
     print("Running news daily script...")
-    call_api_store_initial_news()
+    get_daily_candidate_news()
     print("news daily script done")
 
-def news_weekly_srcipt():
-    print("Running weekly script...")
-    store_candidates_news()
-    print("Weekly script done")
-
-
 if __name__ == "__main__":
-    news_weekly_srcipt()
-
+    news_daily_script()
 

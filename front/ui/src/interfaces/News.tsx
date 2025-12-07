@@ -1,11 +1,12 @@
 export interface NewsItem{
+    fetch_date: Date
     link:string,
     title: string,
-    keywords: string [] 
 }
 
 export interface News{
-    id: number,
-    name: string | undefined,
-    news: NewsItem[]
+    candidate_id: number,
+    news_json: NewsItem[];
+    name: string | undefined
+    
 }
