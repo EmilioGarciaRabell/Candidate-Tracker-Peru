@@ -102,7 +102,7 @@ class Database:
     def get_candidates_with_parties(self):
         conn = self._get_conn()
         query = """
-        select c.id as id ,c.name as name,c.age as age,p.name as party,c.education as education, c.summary as summary, c.ref as ref
+        select c.id as id ,c.name as name,c.age as age,p.name as party,c.education as education, c.summary as summary, c.ref as ref, c.nicknames as nicknames
         from candidate_data.candidate_info c
         LEFT JOIN candidate_data.parties p ON p.id=c.party_id
         """

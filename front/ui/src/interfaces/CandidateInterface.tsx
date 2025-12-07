@@ -18,4 +18,5 @@ export interface Candidate {
     work_experience: string;
     polemicas: string;
     education : string;
+    nicknames: string[]; 
 }
