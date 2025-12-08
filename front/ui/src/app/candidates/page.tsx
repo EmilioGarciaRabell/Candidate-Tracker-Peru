@@ -186,27 +186,7 @@ export default function Candidates() {
       </div>
     </div>
 
-    {/* Party Filter (NOT REMOVED) */}
-    <div className={s.filterGroup}>
-      <label className={s.label}>Partido</label>
-      <div className={s.control}>
-        <div className={s.selectWrap}>
-          <select
-            value={partyFilter}
-            onChange={(e) => setPartyFilter(e.target.value)}
-            className={s.select}
-          >
-            <option value="">Todos los partidos</option>
-            {parties.map((p) => (
-              <option key={p} value={p}>
-                Partido {p}
-              </option>
-            ))}
-          </select>
-          <span className={s.selectArrow}>▼</span>
-        </div>
-      </div>
-    </div>
+
 
     {/* Sort Filter */}
     <div className={s.filterGroup}>
