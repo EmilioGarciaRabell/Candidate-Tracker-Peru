@@ -4,4 +4,4 @@ from dotenv import load_dotenv
 load_dotenv()  # Load environment variables from .env
 
 class Config:
-    SECRET_KEY = os.getenv("SECRET_KEY", "dev_secret")
+    SECRET_KEY = os.environ["SECRET_KEY"]
