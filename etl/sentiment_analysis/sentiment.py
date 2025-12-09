@@ -182,11 +182,59 @@ def insert_sentiment(content, candidate_id):
         print("Error puto")
         return {"status": "error", "message": str(e)}
 
-if __name__ == "__main__":
+
+def get_candidate(id):
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        print("DATABASE_URL not found in environment")
+        return None
+
+    conn = None
+    cur = None
+
+    try:
+        conn = psycopg2.connect(database_url)
+        cur = conn.cursor()
+
+        query = "SELECT name FROM candidate_data.candidate_info WHERE id = %s"
+        cur.execute(query, (id,))  
+
+        candidate = cur.fetchone()  
+        return candidate[0]
+
+    except Exception as e:
+        print("Error:", e)
+        if conn:
+            conn.rollback()
+        return None
+
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+
+def process_all_candidates():
     candidates = get_candidates_id()
     for id, candidate in candidates:
         if candidate == "Pendiente":
             continue
         candidate_sentiment = get_candidate_sentiment(candidate, id)
         insert_sentiment(candidate_sentiment, id)
+
+def process_one_candidate(id):
+    candidate = get_candidate(id)
+    candidate_sentiment = get_candidate_sentiment(candidate, id)
+    insert_sentiment(candidate_sentiment, id)
+
+def main():
+    try:
+        id = int(input("Enter a candidate id to process it: "))
+        process_one_candidate(id)
+    except Exception as e:
+        process_all_candidates()
+
+if __name__ == "__main__":
+    main()
 

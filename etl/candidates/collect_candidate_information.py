@@ -36,6 +36,14 @@ TEXT_CATEGORY_INSTRUCTIONS = (
     "Genera un resumen en texto coherente, detallado."
 )
 
+
+CATEGORIES = ["Experiencia Laboral", "Educacion", "Polemicas", "Biografia" ]
+
+ADDITIONAL_INSTRUCTIONS = {
+    "Experiencia Laboral": WORKEXP_INSTRUCTIONS,
+    "Educacion": EDUCATION_INSTRUCTIONS
+}
+
 def extract_candidate_category_info(text, candidate, category, category_instructions):
     if not text:
         return {
@@ -394,36 +402,83 @@ def update_refs(candidate_id, refs):
 
     except Exception as e:
         return {"status": "error", "message": str(e)}
+def get_candidate(id):
+    database_url = os.environ.get("DATABASE_URL")
+    if not database_url:
+        print("DATABASE_URL not found in environment")
+        return None
+
+    conn = None
+    cur = None
+
+    try:
+        conn = psycopg2.connect(database_url)
+        cur = conn.cursor()
+
+        query = "SELECT name FROM candidate_data.candidate_info WHERE id = %s"
+        cur.execute(query, (id,))  
+
+        candidate = cur.fetchone()  
+        return candidate[0]
+
+    except Exception as e:
+        print("Error:", e)
+        if conn:
+            conn.rollback()
+        return None
+
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
     
-def main():
-    candidates = get_candidates_id()
-    categories = ["Experiencia Laboral", "Educacion", "Polemicas", "Biografia" ]
+def process_individual_candidate():
+    try:
+        id = int(input("Enter the id of the candidate: "))
+        name = get_candidate(id)
+        
+        print(f"Processing candidate {id}")
+        process_categories(name, id)
+    except Exception as e:
+        print("Please enter a valid id")
+        process_individual_candidate()
+    
+def process_categories(candidate_name, candidate_id):
+    all_refs = []
 
-    additional_instructions = {
-        "Experiencia Laboral": WORKEXP_INSTRUCTIONS,
-        "Educacion": EDUCATION_INSTRUCTIONS
-    }
+    for category in CATEGORIES:
+        category_instructions = ADDITIONAL_INSTRUCTIONS.get(category, "")
 
-    for candidate_id, candidate_name in candidates:
-        all_refs = []
+        used_refs = process_candidate_category(
+            candidate_id,
+            candidate_name,
+            category,
+            category_instructions
+        )
 
-        if candidate_name == "Pendiente":
-            continue
-
-        for category in categories:
-            category_instructions = additional_instructions.get(category, "")
-
-            used_refs = process_candidate_category(
-                candidate_id,
-                candidate_name,
-                category,
-                category_instructions
-            )
-
-            if used_refs:
-                all_refs.extend(used_refs)
+        if used_refs:
+            all_refs.extend(used_refs)
 
         update_refs(candidate_id, all_refs)
+
+def process_all_candidates():
+    print("Processing all candidates")
+    candidates = get_candidates_id()
+
+    for candidate_id, candidate_name in candidates:
+        process_categories(candidate_name, candidate_id)
+    return
+
+def main():
+
+    inp = input("Chose 1 for  indiviadual analysis, anything else for automatica analysis of all candidates: ")
+        
+    if inp == "1":
+        process_individual_candidate()
+    else:
+        process_all_candidates()
+
 
 
 

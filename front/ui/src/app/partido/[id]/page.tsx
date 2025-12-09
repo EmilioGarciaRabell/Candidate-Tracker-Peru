@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
-import Image from "next/image";
 import { Party } from "@/interfaces/Party";
 import profilePicture from "./profile.jpg";
 import styles from "./partido.module.css";
@@ -142,14 +141,7 @@ export default function PartidoPage() {
                   />
                 </figure>
               </div>
-              <div className="card-content">
-                <p className="title is-6 mb-3">Historia</p>
-                {party.summary ? (
-                  <p className="is-size-7 has-text-grey">{party.summary}</p>
-                ) : (
-                  <p className="is-size-7 has-text-grey-light">No se encontro info del partido</p>
-                )}
-              </div>
+              
             </div>
           </aside>
 
@@ -177,7 +169,7 @@ export default function PartidoPage() {
             <div className={`box ${styles.boxSoft}`} id={`panel-${activeTab}`} role="tabpanel">
               {activeTab === "historia" && (
                 <>
-                  <h3 className="title is-5">Hostoria</h3>
+                  <h3 className="title is-5">Historia</h3>
                   <p className="content">{party.summary ?? "No hay información disponible."}</p>
                 </>
               )}
