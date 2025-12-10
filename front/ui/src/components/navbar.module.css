@@ -1,0 +1,237 @@
+:root {
+  --white: #ffffff;
+  --text: #2a2f36;
+  --text-soft: #5f6b7a;
+  --border: #e9edf3;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-strong: 0 10px 24px rgba(16, 24, 40, 0.08);
+  --accent-1: #c7e7ff;
+  --accent-2: #86ccff;
+  --cta: #007bff;
+  --cta-hover: #0062cc;
+
+  --nav-height: 84px;          /* taller bar */
+  --nav-font-size: 17.25px;    /* bigger text */
+  --nav-item-x: 1.15rem;       /* horizontal padding */
+}
+
+/* Sticky wrapper */
+.headerWrap {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+}
+
+/* Pure light navbar */
+.navbarLight {
+  background: var(--white) !important;
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  min-height: var(--nav-height);
+  font-family: "Inter", "Poppins", "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Subtle elevation after scrolling a bit */
+.scrolled {
+  box-shadow: var(--shadow-strong);
+}
+
+/* Keep Bulma from adding dark hover */
+.navbarLight .navbar-item:hover {
+  background-color: transparent !important;
+}
+
+/* Brand / logo */
+.logoLink {
+  background: none !important;
+  padding-top: 0.4rem !important;
+  padding-bottom: 0.4rem !important;
+}
+
+.logoImg {
+  transition: transform 0.22s ease, filter 0.22s ease;
+  filter: none !important;
+}
+.logoImg:hover {
+  transform: translateY(-1px) scale(1.04);
+  filter: brightness(1.06);
+}
+
+/* Start section layout: more breathing room */
+.navStart {
+  gap: 0.25rem; /* we'll use padding on items for primary spacing */
+}
+
+/* Nav items: BIGGER, clearer, with pastel active underline */
+.navItem {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: var(--nav-height);
+  padding: 0 var(--nav-item-x);
+  font-size: var(--nav-font-size);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--text-soft) !important;
+  transition: color 0.2s ease, transform 0.12s ease;
+}
+
+.navItem:hover {
+  color: var(--text) !important;
+  transform: translateY(-1px);
+}
+
+.active {
+  color: var(--text) !important;
+}
+
+.active::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--nav-item-x) - 0.2rem);
+  right: calc(var(--nav-item-x) - 0.2rem);
+  bottom: 10px;                 /* thicker underline sits a bit above bottom edge */
+  height: 3px;                  /* thicker for presence */
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  border-radius: 2px;
+}
+
+/* Gentle hover hint for inactive links */
+.navItem:not(.active)::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  width: 0;
+  height: 2px;
+  background: #eaf3fb;
+  transform: translateX(-50%);
+  transition: width 0.2s ease;
+  border-radius: 2px;
+}
+.navItem:not(.active):hover::after {
+  width: 38%;
+}
+
+/* CTA: larger pill to match scale */
+.cta {
+  background: var(--cta);
+  color: #fff !important;
+  border: none;
+  border-radius: 999px;
+  padding: 0.72rem 1.35rem;         /* bigger tap target */
+  font-weight: 700;
+  font-size: 16.5px;
+  letter-spacing: 0.2px;
+  box-shadow: 0 10px 24px rgba(0, 123, 255, 0.28);
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+.cta:hover {
+  background: var(--cta-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(0, 123, 255, 0.34);
+}
+
+/* Burger icon lighter for white bg + bigger tap target */
+.navbar-burger {
+  margin-right: 0.5rem;
+}
+.navbar-burger span {
+  background-color: #9aa8b7 !important;
+}
+
+/* -------- MOBILE FOCUS -------- */
+/* MOBILE LAYOUT – phones */
+@media (max-width: 768px) {
+  /* --- GLOBAL BULMA OVERRIDES (must use :global in CSS modules) --- */
+
+  /* Navbar itself always white */
+  :global(.navbar),
+  :global(.navbar.is-fixed-top) {
+    min-height: 64px;
+    background-color: #ffffff !important;
+    color: var(--text) !important;
+  }
+
+  /* Burger */
+  :global(.navbar-burger) {
+    margin-right: 0.5rem;
+  }
+  :global(.navbar-burger span) {
+    background-color: #9aa8b7 !important;
+  }
+
+  /* Mobile dropdown menu: white card, NO black bg */
+  :global(.navbar-menu),
+  :global(.navbar-menu.is-active) {
+    padding: 0.5rem 0.75rem 1rem;
+    background-color: #ffffff !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    border-top: 1px solid var(--border);
+    border-radius: 0 0 14px 14px;
+  }
+
+  /* Extra safety: page background stays white on mobile */
+  :global(html),
+  :global(body) {
+    background-color: #ffffff !important;
+  }
+
+  /* --- YOUR CUSTOM CLASSES (no :global needed) --- */
+
+  /* Stack items vertically */
+  .navStart {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0.25rem 0;
+  }
+
+  /* Nav item as full-width row, left aligned */
+  .navItem {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: auto;
+    padding: 0.7rem 0.5rem;
+    font-size: 16px;
+    border-radius: 8px;
+    transform: none; /* no hover lift on mobile */
+  }
+
+  /* Kill fancy underline lines on mobile – they can cause weird visuals */
+  .navItem::after {
+    content: none !important;
+  }
+
+  .active {
+    color: var(--text) !important;
+    background-color: #f3f6fb; /* subtle light blue/gray highlight */
+  }
+
+  /* CTA = full-width button at bottom */
+  .cta {
+    width: 100%;
+    justify-content: center;
+    font-size: 16px;
+    padding: 0.9rem 1rem;
+    margin-top: 0.4rem;
+    border-radius: 999px;
+    background-color: var(--cta) !important;
+    color: #ffffff !important;
+  }
+}
+
+
+
+
+/* Extra safety: ensure page background is white at all sizes */
+html,
+body {
+  background-color: #ffffff !important;
+}
+
+
+

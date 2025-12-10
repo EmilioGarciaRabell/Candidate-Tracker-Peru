@@ -6,3 +6,9 @@ Flask-Migrate
 Flask-Cors
 python-dotenv
 gunicorn # For production purposes
+psycopg2
+apscheduler
+unidecode
+transformers
+torch
+google-cloud-storage

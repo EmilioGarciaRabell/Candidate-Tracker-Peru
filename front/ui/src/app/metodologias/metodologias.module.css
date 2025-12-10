@@ -1,0 +1,546 @@
+.pageWrapper {
+  background-color: #f7f9fc;
+}
+
+/* Hero */
+
+.heroSection {
+  padding-top: 5rem;
+  padding-bottom: 4rem;
+  background: f7f9fc; 
+}
+
+.heroContent {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.heroEyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1d4f91;
+  margin-bottom: 0.75rem;
+}
+
+.heroTitle {
+  color: #122b46;
+  margin-bottom: 1.25rem;
+  line-height: 1.15;
+}
+
+.heroSubtitle {
+  color: #4a5970;
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+/* Breadcrumb */
+
+.breadcrumbWrapper {
+  max-width: 900px;
+  margin: 0 auto 1.5rem auto;
+}
+
+.breadcrumb {
+  font-size: 0.85rem;
+  color: #6f7b8f;
+}
+
+.breadcrumbLink {
+  color: #3273dc;
+  text-decoration: none;
+}
+
+.breadcrumbLink:hover {
+  text-decoration: underline;
+}
+
+.breadcrumbSeparator {
+  margin: 0 0.25rem;
+}
+
+.breadcrumbCurrent {
+  color: #9aa3b5;
+}
+
+/* Overview */
+
+.overviewSection {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e4ebf6;
+}
+
+.overviewGrid {
+  display: grid;
+  grid-template-columns: 2fr 2fr;
+  gap: 1.75rem;
+}
+
+.overviewCard {
+  background: #f4f7ff;
+  border-radius: 1rem;
+  padding: 1.75rem 1.5rem;
+  border: 1px solid #d7e5ff;
+}
+
+.overviewLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #1d4f91;
+  margin-bottom: 0.5rem;
+}
+
+.overviewTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #122b46;
+  margin-bottom: 0.75rem;
+}
+
+.overviewList {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.25rem 0 0 0;
+}
+
+.overviewList li {
+  position: relative;
+  padding-left: 1.2rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+  color: #3f4b61;
+}
+
+.overviewList li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  top: -1px;
+  font-size: 1.1rem;
+  color: #3273dc;
+}
+
+/* Generic typography */
+
+.mainSection {
+  background-color: #f7f9fc;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+.altSection {
+  background-color: #ffffff;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  border-top: 1px solid #e4ebf6;
+  border-bottom: 1px solid #e4ebf6;
+}
+
+.sectionTitle {
+  color: #122b46;
+}
+
+.bodyParagraph {
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: #4b5668;
+  margin-bottom: 0.9rem;
+}
+
+.boldText {
+  font-weight: 600;
+  color: #273246;
+}
+
+/* Pill label */
+
+.pillLabel {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: #e4f0ff;
+  color: #1d4f91;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+
+/* Ordered / unordered lists */
+
+.orderedList {
+  margin: 1rem 0 1.25rem 1.25rem;
+  padding-left: 1.25rem;
+  font-size: 0.97rem;
+  color: #3f4b61;
+}
+
+.orderedList li {
+  margin-bottom: 0.6rem;
+}
+
+.subList {
+  list-style: none;
+  margin: 0.6rem 0 0.6rem 0;
+  padding-left: 1.3rem;
+}
+
+.subList li {
+  position: relative;
+  margin-bottom: 0.45rem;
+  font-size: 0.95rem;
+  color: #3f4b61;
+}
+
+.subList li::before {
+  content: "◦";
+  position: absolute;
+  left: -1rem;
+  top: 0;
+  color: #3273dc;
+}
+
+/* Flow card */
+
+.flowCard {
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 1.75rem 1.5rem;
+  border: 1px solid #e4ebf6;
+  box-shadow: 0 10px 24px rgba(15, 50, 95, 0.06);
+}
+
+.flowLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #1d4f91;
+  margin-bottom: 0.75rem;
+}
+
+.flowSteps {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.flowSteps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  margin-bottom: 0.9rem;
+}
+
+.stepBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 999px;
+  background: #3273dc;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.stepTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #122b46;
+  margin-bottom: 0.1rem;
+}
+
+.stepText {
+  font-size: 0.9rem;
+  color: #4b5668;
+}
+
+/* Info note */
+
+.infoNote {
+  margin-top: 1.25rem;
+  padding: 1rem 1rem;
+  border-radius: 0.75rem;
+  background: #f0f7ff;
+  border-left: 4px solid #3273dc;
+  font-size: 0.95rem;
+}
+
+/* Sentiment side card */
+
+.sentimentCard {
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 1.6rem 1.4rem;
+  border: 1px solid #e4ebf6;
+  box-shadow: 0 10px 24px rgba(15, 50, 95, 0.06);
+}
+
+.sentimentLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #1d4f91;
+  margin-bottom: 0.75rem;
+}
+
+.bulletList {
+  margin: 0.75rem 0 0.75rem 1.1rem;
+  padding-left: 1.1rem;
+}
+
+.bulletList li {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: #3f4b61;
+}
+
+/* Diagram sections */
+
+.diagramSection {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  background-color: #f7f9fc;
+}
+
+.diagramSectionAlt {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  background-color: #ffffff;
+  border-top: 1px solid #e4ebf6;
+  border-bottom: 1px solid #e4ebf6;
+}
+
+.diagramCard {
+  max-width: 960px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 2.25rem 2rem;
+  border-radius: 1.25rem;
+  background: linear-gradient(135deg, #e4f0ff 0%, #ffffff 65%);
+  border: 1px solid #d7e5ff;
+  box-shadow: 0 18px 40px rgba(20, 60, 120, 0.12);
+}
+
+.diagramTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #122b46;
+  margin-bottom: 0.75rem;
+}
+
+.diagramSubtitle {
+  font-size: 0.95rem;
+  color: #3f4b61;
+  margin-bottom: 1.5rem;
+}
+
+.diagramWrapper {
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.diagramImg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Limitations band & cards */
+
+.sectionIntro {
+  max-width: 680px;
+  margin: 0 auto 2.5rem auto;
+  text-align: center;
+}
+
+.sectionIntroText {
+  font-size: 0.98rem;
+  color: #4b5668;
+  margin-top: 0.75rem;
+}
+
+.storyCard {
+  background: #ffffff;
+  border-radius: 1rem;
+  padding: 1.75rem 1.5rem;
+  border: 1px solid #e4ebf6;
+  box-shadow: 0 10px 24px rgba(15, 50, 95, 0.06);
+  height: 100%;
+}
+
+.cardTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #122b46;
+  margin-bottom: 0.9rem;
+}
+
+.limitationsBand {
+  margin-top: 2.5rem;
+  padding: 1.75rem 1.5rem;
+  border-radius: 1.1rem;
+  background: #eaf2ff;
+  border: 1px solid #c8dbff;
+}
+
+.bandTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #122b46;
+  margin-bottom: 0.75rem;
+}
+
+/* Responsive tweaks */
+
+@media screen and (max-width: 1024px) {
+  .heroSection {
+    padding-top: 4rem;
+    padding-bottom: 3rem;
+  }
+
+  .overviewGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .mainSection,
+  .altSection,
+  .diagramSection,
+  .diagramSectionAlt {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+}
+
+/* MOBILE – phones */
+@media screen and (max-width: 768px) {
+  /* Page background + spacing */
+  .pageWrapper {
+    background-color: #ffffff; /* flatter on small screens */
+  }
+    .heroTitle {
+    font-size: 1.55rem !important;
+    line-height: 1.22;
+    margin-bottom: 0.9rem;
+  }
+
+  .heroSubtitle {
+    font-size: 0.69rem;
+  }
+  .heroSection {
+    padding-top: 3rem;
+    padding-bottom: 2.5rem;
+    background: #ffffff; /* remove gradient on tiny screens for simplicity */
+  }
+
+  .breadcrumbWrapper {
+    padding: 0 1rem;
+  }
+
+  .heroContent {
+    padding: 0 1rem;
+  }
+
+  .heroTitle {
+    font-size: 1.8rem;
+    line-height: 1.2;
+  }
+
+  .heroSubtitle {
+    font-size: 0.95rem;
+    max-width: 100%;
+  }
+
+  /* Overview cards: full-width and lighter */
+  .overviewSection {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  .overviewGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+
+  .overviewCard {
+    padding: 1.3rem 1.1rem;
+    border-radius: 0.9rem;
+  }
+
+  /* Main sections + alt sections */
+  .mainSection,
+  .altSection,
+  .diagramSection,
+  .diagramSectionAlt {
+    padding-top: 2.25rem;
+    padding-bottom: 2.25rem;
+  }
+
+  .mainSection,
+  .altSection {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .sectionTitle {
+    font-size: 1.3rem;
+  }
+
+  .bodyParagraph {
+    font-size: 0.95rem;
+  }
+
+  /* Flow card / sentiment card less “heavy” on mobile */
+  .flowCard,
+  .sentimentCard,
+  .storyCard {
+    padding: 1.4rem 1.25rem;
+    border-radius: 0.9rem;
+    box-shadow: 0 8px 20px rgba(15, 50, 95, 0.06);
+  }
+
+  .infoNote {
+    margin-top: 1rem;
+  }
+
+  /* Diagram card: less padding, full-width feel */
+  .diagramCard {
+    margin: 0 1rem;
+    padding: 1.6rem 1.25rem;
+    border-radius: 1rem;
+  }
+
+  .diagramTitle {
+    font-size: 1.2rem;
+  }
+
+  .diagramSubtitle {
+    font-size: 0.9rem;
+  }
+
+  /* Limitations band */
+  .limitationsBand {
+    margin-top: 2rem;
+    padding: 1.4rem 1.2rem;
+    border-radius: 0.9rem;
+  }
+
+  .sectionIntro {
+    padding: 0 1rem;
+    margin-bottom: 2rem;
+  }
+}

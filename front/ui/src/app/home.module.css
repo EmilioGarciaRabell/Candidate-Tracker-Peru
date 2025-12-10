@@ -1,0 +1,329 @@
+:root {
+  --bg-start: #fafcff;
+  --bg-end: #ffffff;
+  --surface: #ffffff;
+  --border: #e9edf3;
+  --text: #1f2329;
+  --muted: #596273;
+
+  --accent-1: #c7e7ff; /* pastel blue */
+  --accent-2: #86ccff;
+
+  --cta: #007bff;
+  --cta-hover: #0062cc;
+
+  --radius-lg: 16px;
+  --radius-md: 12px;
+
+  --shadow-soft: 0 10px 28px rgba(16, 24, 40, 0.06);
+  --shadow-strong: 0 16px 44px rgba(16, 24, 40, 0.08);
+}
+
+/* Skip link */
+.skipLink {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+}
+.skipLink:focus {
+  left: 12px;
+  top: 12px;
+  z-index: 100;
+  background: #000;
+  color: #fff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+}
+
+/* Page background */
+.background {
+  background: linear-gradient(180deg, var(--bg-start) 0%, var(--bg-end) 45%);
+  padding: 2rem 0 3rem;
+}
+
+/* Centered content shell */
+.shell {
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+/* Hero layout */
+.hero {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 2.25rem;
+  align-items: center;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+/* Text styles */
+.kicker {
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #0b6bcb;
+  font-weight: 700;
+}
+
+.title {
+  font-family: "Inter", "Poppins", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 800;
+  line-height: 1.05;
+  font-size: clamp(2rem, 3.5vw + 1rem, 4rem);
+  color: var(--text);
+  margin: 0;
+}
+
+.titleAccent {
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.subtitle {
+  font-size: clamp(1rem, 1vw + 0.75rem, 1.25rem);
+  color: var(--muted);
+  max-width: 52ch;
+}
+
+/* CTAs */
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.ctaPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.25rem;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: #fff;
+  background: var(--cta);
+  border: 1px solid transparent;
+  box-shadow: 0 12px 28px rgba(0, 123, 255, 0.25);
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+.ctaPrimary:hover {
+  background: var(--cta-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 16px 36px rgba(0, 123, 255, 0.3);
+}
+
+.ctaGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.15rem;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  color: #0b6bcb;
+  background: #f5fbff;
+  border: 1px solid #d9ebff;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+.ctaGhost:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(11, 107, 203, 0.16);
+}
+
+/* Trust badges */
+.badges {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  list-style: none;
+  padding: 0;
+}
+.badge {
+  font-size: 0.78rem;
+  color: #1275d1;
+  background: #f5fbff;
+  border: 1px solid #d9ebff;
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* Illustration wrap */
+.imageWrap {
+  display: flex;
+  justify-content: center;
+}
+
+.imageCard {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  padding: 0.75rem;
+}
+.heroImg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius-md);
+}
+
+/* Quick links */
+.quickLinks {
+  margin-top: 2.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.qLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.04);
+}
+.qLink:hover {
+  transform: translateY(-1px);
+  border-color: #dfe8f2;
+  box-shadow: var(--shadow-strong);
+}
+.arrow {
+  transition: transform 0.15s ease;
+}
+.qLink:hover .arrow {
+  transform: translateX(2px);
+}
+
+/* Respect users that prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ctaPrimary,
+  .ctaGhost,
+  .qLink,
+  .logoImg,
+  .arrow {
+    transition: none !important;
+  }
+}
+
+/* Responsiveness */
+@media (max-width: 1024px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+  .imageCard {
+    padding: 0.6rem;
+  }
+  .quickLinks {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* 📱 MOBILE – phones */
+@media (max-width: 768px) {
+  .background {
+    padding: 1.75rem 0 2.25rem;
+  }
+
+  .shell {
+    padding-inline: 1rem;
+  }
+
+  .hero {
+    gap: 1.5rem;
+  }
+
+  .copy {
+    gap: 0.9rem;
+  }
+
+  .kicker {
+    font-size: 0.78rem;
+    letter-spacing: 0.16em;
+  }
+
+  .title {
+    font-size: 1.8rem; /* clamp is fine but this keeps it from getting too huge */
+    line-height: 1.15;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    max-width: 100%;
+  }
+
+  /* CTAs: stacked and easier to tap */
+  .ctaRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+    margin-top: 0.25rem;
+  }
+
+  .ctaPrimary,
+  .ctaGhost {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Badges wrap nicely */
+  .badges {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.22rem 0.55rem;
+  }
+
+  /* Illustration card: lighter on mobile */
+  .imageWrap {
+    order: -1;              /* put image first if you prefer hero visual on top */
+    margin-bottom: 0.75rem;
+  }
+
+  .imageCard {
+    padding: 0.5rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 22px rgba(16, 24, 40, 0.06);
+  }
+
+  .heroImg {
+    border-radius: 10px;
+  }
+
+  /* Quick links: full-width list style */
+  .quickLinks {
+    margin-top: 2rem;
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .qLink {
+    padding: 0.8rem 0.9rem;
+    font-size: 0.95rem;
+    box-shadow: 0 6px 16px rgba(16, 24, 40, 0.05);
+  }
+}

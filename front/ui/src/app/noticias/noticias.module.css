@@ -1,0 +1,292 @@
+/* Page background + soft hero */
+.pageBg {
+  background: linear-gradient(180deg, #fafcff 0%, #ffffff 40%);
+  padding: 2.5rem 0 3rem;
+}
+
+/* HERO CARD */
+
+.heroSoft {
+  margin-top: 1.5rem;
+  background: #ffffff;
+  border: 1px solid rgba(16, 24, 40, 0.06);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.04);
+}
+
+.heroRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3rem;
+}
+
+/* GRID OF CANDIDATES */
+
+.grid {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.gridItem {
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+  padding: 1rem 1.1rem;
+}
+
+/* Loading skeletons */
+
+.skeletonCard {
+  height: 80px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #f1f5f9 0%, #f8fafc 50%, #f1f5f9 100%);
+  background-size: 200% 100%;
+  animation: pulseFade 1.4s ease-in-out infinite;
+  border: 1px solid #e5e7eb;
+}
+
+@keyframes pulseFade {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+/* FILTERS BOX */
+
+.filtersBox {
+  border: 1px solid rgba(16, 24, 40, 0.06);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(16, 24, 40, 0.04);
+}
+
+/* Inputs */
+
+.input {
+  background: #ffffff !important;
+  border: 1px solid #e6edf5 !important;
+  color: #2b2f36 !important;
+  border-radius: 10px !important;
+  font-size: 0.95rem;
+}
+.input:focus {
+  border-color: #bcdfff !important;
+  box-shadow: 0 0 0 0.125em rgba(0, 123, 255, 0.12) !important;
+}
+
+.input::placeholder {
+  color: #64748b !important;
+  opacity: 1 !important;
+}
+
+/* Dropdown container (each candidate card inner block) */
+
+.dropdown {
+  width: 100%;
+}
+
+/* Header line (name + count + caret) */
+
+.dropdownHeader {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.name {
+  text-align: left;
+}
+
+.extraItems {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Count chip */
+
+.count {
+  min-width: 1.7rem;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+/* caret (“+”) rotated when open */
+
+.caret {
+  font-size: 1.4rem;
+  transform: rotate(0deg);
+  transition: transform 0.25s ease, opacity 0.2s ease;
+  opacity: 0.7;
+  margin-bottom: 3px;
+}
+
+.caret.open {
+  transform: rotate(45deg); /* + becomes × */
+  opacity: 1;
+}
+
+/* Dropdown content (hidden by default) */
+
+.dropdownBody {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+/* When open */
+
+.show {
+  max-height: 400px;
+}
+
+/* Scroll wrapper for links */
+
+.scroll {
+  max-height: 220px;
+  overflow-y: auto;
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Each news link */
+
+.dropdownItem {
+  display: block;
+  padding: 0.5rem 0;
+  font-size: 0.95rem;
+  color: #1f2933;
+  text-decoration: none;
+  border-bottom: 1px solid #f3f4f6;
+  transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+.dropdownItem:hover {
+  color: #0b6bcb;
+  opacity: 0.85;
+}
+
+.dropdownItem:last-child {
+  border-bottom: none;
+}
+
+/* PAGINATION BUTTONS */
+
+.buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.75rem;
+}
+
+/* Minimal link-style button */
+
+.linkButton {
+  --btn-color: #0b6bcb;
+  background: transparent;
+  border: none;
+  padding: 0.35rem 0.5rem;
+  font: inherit;
+  color: var(--btn-color);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: color 160ms ease, transform 120ms ease, opacity 120ms ease;
+}
+
+.linkButton:hover:not(:disabled) {
+  color: #0a5db0;
+  transform: translateX(1px);
+}
+
+.linkButton:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* MOBILE – phones */
+
+@media (max-width: 768px) {
+  .pageBg {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    background: #ffffff;
+  }
+
+  .heroSoft {
+    margin-top: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(16, 24, 40, 0.05);
+  }
+
+  .heroRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .heroRow h1.title {
+    font-size: 1.5rem;
+  }
+
+  .filtersBox {
+    margin-top: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(16, 24, 40, 0.04);
+  }
+
+  .grid {
+    margin-top: 1.5rem;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .gridItem {
+    padding: 0.9rem 0.95rem;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
+  }
+
+  .dropdownHeader {
+    font-size: 1rem;
+  }
+
+  .scroll {
+    max-height: 180px;
+  }
+
+  .dropdownItem {
+    font-size: 0.9rem;
+    padding: 0.45rem 0;
+  }
+
+  .buttons {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .linkButton {
+    justify-content: center;
+    width: 100%;
+  }
+}

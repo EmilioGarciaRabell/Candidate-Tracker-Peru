@@ -1,0 +1,33 @@
+name: Get Daily News
+
+on:
+  on:
+  schedule:
+    - cron: '0 0 * * *'   # every day at 12:00 AM UTC
+    - cron: '0 12 * * *'  # every day at 12:00 PM UTC
+  workflow_dispatch:
+
+
+jobs:
+  populate-db:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: populate-db-prod
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run population script
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python etl/news_features/get_latest_news.py

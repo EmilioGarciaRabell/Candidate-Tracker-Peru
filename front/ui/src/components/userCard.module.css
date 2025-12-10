@@ -1,0 +1,176 @@
+:root {
+  --surface: #fff;
+  --border: #e9edf3;
+  --shadow: 0 10px 28px rgba(16, 24, 40, 0.05);
+  --text: #2b2f36;
+  --muted: #6b7280;
+  --chip-bg: #f5fbff;
+  --chip-border: #d9ebff;
+  --chip-text: #1275d1;
+  --accent-1: #c2e7ff;
+  --accent-2: #7dccff;
+}
+
+/* Card */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 1.7rem 1.6rem 1.5rem;   /* ⬅ bigger padding */
+  box-shadow: var(--shadow);
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+
+  display: grid;
+  grid-template-columns: 88px 1fr; /* ⬅ bigger avatar column */
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "avatar header"
+    "avatar header"
+    ". footer";
+
+  column-gap: 1.2rem;              /* ⬅ more horizontal spacing */
+  row-gap: 0.55rem;
+  cursor: pointer;
+
+  min-height: 235px;               /* ⬅ slightly taller */
+}
+
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(0, 123, 255, 0.12);
+  border-color: #dfe8f2;
+}
+
+/* Avatar */
+.avatarWrap {
+  grid-area: avatar;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.avatarRing {
+  width: 88px;
+  height: 88px; 
+  border-radius: 50%;
+  padding: 3px;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  box-shadow: 0 10px 22px rgba(125, 204, 255, 0.25);
+}
+
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: block;
+  object-fit: cover;
+  background: #fff;
+}
+
+
+
+/* Header */
+.header {
+  grid-area: header;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.name {
+  font-size: 1.15rem;         /* was 1.05 */
+  font-weight: 600;
+  line-height: 1.32;
+}
+
+
+.metaRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;                /* more breathing room */
+  flex-wrap: wrap;
+}
+
+.metaText {
+  font-size: 0.92rem;         /* slightly bigger */
+  color: var(--muted);
+  font-weight: 500;
+}
+
+
+.chip {
+  font-size: 0.82rem;
+  color: var(--chip-text);
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  line-height: 1.1;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #d1d5db;
+}
+
+/* Footer */
+.footer {
+  grid-area: footer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 0.15rem;
+}
+
+/* Minimal link-style button */
+.linkButton {
+  --btn-color: #0b6bcb;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--btn-color);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: color 160ms ease, transform 120ms ease;
+}
+
+.linkButton:hover {
+  color: #0a5db0;
+  transform: translateX(1px);
+}
+
+.arrow {
+  transition: transform 160ms ease;
+}
+.linkButton:hover .arrow {
+  transform: translateX(2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card {
+    grid-template-columns: 74px 1fr;
+    padding: 1.3rem;
+    min-height: 200px;
+  }
+  .avatarRing {
+    width: 74px;
+    height: 74px;
+  }
+  .name {
+    font-size: 1.07rem;
+  }
+}
+
+
+

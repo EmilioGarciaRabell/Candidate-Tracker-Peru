@@ -1,8 +1,18 @@
 @import "tailwindcss";
+@import "bulma/css/bulma.css";
+
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+}
+html, body {
+  background: #ffffff !important;
+  color: #222 !important;
+}
+
+.box, .card {
+  background: #ffffff !important;
+  color: #222 !important;
 }
 
 @theme inline {
@@ -14,7 +24,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --foreground: #ededed;
     --foreground: #ededed;
   }
 }
@@ -23,4 +33,154 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+
+hr {
+  margin: 24px 0;
+  border: none;
+  border-top: 1px solid #eee;
+}
+
+/* Reset */
+* {
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+
+/* Clean minimalistic overrides */
+body {
+  background: #f5f6fa !important;
+  color: #1a1a1a !important;
+}
+
+/* Card styling */
+.card {
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  background: white;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+/* Section titles */
+.title,
+.subtitle {
+  color: #222 !important;
+  font-weight: 700;
+}
+
+/* Light small section text */
+.has-text-grey {
+  color: #555 !important;
+}
+
+/* Make navbar minimal */
+.navbar {
+  box-shadow: none !important;
+  border-bottom: 1px solid #e2e2e2 !important;
+  padding: 0.5rem 1rem !important;
+}
+
+.navbar-item,
+.navbar-link {
+  color: #222 !important;
+  font-weight: 500;
+}
+
+/* Progress bar colors */
+.progress.is-negative {
+  background-color: #ff6b6b !important;
+}
+.progress.is-neutral {
+  background-color: #f4c542 !important;
+}
+.progress.is-positive {
+  background-color: #4cd964 !important;
+}
+
+
+.header{
+  background-color: white;
+}
+
+.div1{
+  padding-inline: calc(var(--spacing) * 4);
+  margin-inline: inline ;
+  margin-top: 10px;
+}
+
+@media (min-width: 640px) {
+  .div1 {
+    padding-inline: calc(var(--spacing) * 6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .div1 {
+    padding-inline: calc(var(--spacing) * 8);
+  }
+}
+
+.navflex{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: calc(var(--spacing) * 16);
+  margin-top: 20px;
+}
+
+.logo{
+  flex-shrink: 0;
+}
+
+
+@media (min-width: 1024px) {
+  .div1 {
+    height: calc(var(--spacing) * 16);
+  }
+}
+
+.links{
+  display: none;
+}
+
+
+  @media (min-width: 1024px) {
+  .links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem; /* adds spacing between links */
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@layer components {
+  .nav-link {
+    @apply text-black px-5 py-2.5 font-medium hover:text-black hover:bg-gray-100  rounded-full text-2xl
+  }
+}
+
+.customButton{
+  @apply
+    px-5 py-2.5 text-base transition-all duration-200 hover:bg-red-400 hover:text-black focus:text-black focus:bg-yellow-400 font-semibold text-white bg-black rounded-full
+}
+
+
+
+/*Candidate Tabs */
+.job-entry strong,
+.edu-entry strong {
+    /* Use a dark color, e.g., Bulma's dark grey */
+    color: #363636; 
+    font-weight: 600; /* Ensure it's bold */
+}
+
+html body strong,
+html body b,
+html body .has-text-weight-bold {
+  color: #122b46 !important; /* or whatever dark text color you use */
 }
