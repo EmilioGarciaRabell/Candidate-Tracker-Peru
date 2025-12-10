@@ -34,9 +34,7 @@ export default function Home() {
                 <Link href="/candidates" className={styles.ctaPrimary} aria-label="Ir a lista de candidatos">
                   Infórmate ahora
                 </Link>
-                <Link href="/dashboard" className={styles.ctaGhost} aria-label="Ver tendencias y panel de datos">
-                  Ver tendencias
-                </Link>
+                
               </div>
 
               {/* Tiny trust row */}
@@ -73,10 +71,7 @@ export default function Home() {
               Noticias
               <span aria-hidden="true" className={styles.arrow}>→</span>
             </Link>
-            <Link href="/dashboard" className={styles.qLink}>
-              Tendencias
-              <span aria-hidden="true" className={styles.arrow}>→</span>
-            </Link>
+            
           </nav>
         </div>
       </section>
