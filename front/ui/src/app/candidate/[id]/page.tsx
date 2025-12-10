@@ -6,7 +6,6 @@ import PublicOpinionSection from "./PublicOpinionSection";
 import profilePicture from "./profile.jpg";
 import styles from "./candidate.module.css";
 import "bulma/css/bulma.min.css";
-import DOMPurify from 'dompurify';
 
 /* ===== Socials Types & Helpers (NEW) ===== */
 type SocialsApi = {
@@ -192,17 +191,7 @@ useEffect(() => {
   };
 }, [id, apiUrl]);
 
-    const renderHtmlContent = (htmlContent: string) => {
-    // Sanitize the HTML to remove any potential malicious scripts
-    const cleanHtml = DOMPurify.sanitize(htmlContent);
-
-    return (
-        <div
-            className="content-display has-text-grey"
-            dangerouslySetInnerHTML={{ __html: cleanHtml }}
-        />
-    );
-};
+    
   
   const tabs = [
     ["historia", "Historia"],
