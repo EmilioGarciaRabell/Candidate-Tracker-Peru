@@ -5,8 +5,6 @@ from src.extensions import  cors
 from src.routes.main_routes import main_bp
 from src.routes.candidate_page import candidate_bp
 from src.routes.news_page import news_bp
-from datetime import timezone
-import pytz
 
 
 from src.routes.google_cloud_storage import google_storage_bp

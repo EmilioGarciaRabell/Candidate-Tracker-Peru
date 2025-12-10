@@ -94,7 +94,7 @@ export default function UserCard({
         </h2>
         <div className={s.metaRow}>
           <span className={s.chip}>
-            {party ? `Partido ${party}` : "Sin partido"}
+            {party ? `${party}` : "Sin partido"}
           </span>
           <span className={s.dot} />
           <span className={s.metaText}>{age ?? "—"} años</span>
