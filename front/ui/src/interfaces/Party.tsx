@@ -3,6 +3,6 @@ export interface Party{
     name:string,
     position:string,
     summary:string,
-    ref: string,
+    ref: string[],
     image: string
 }

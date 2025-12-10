@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify
 from src.services.data_management import candidates
+import json
 
 comparison_bp = Blueprint('compare', __name__)
 

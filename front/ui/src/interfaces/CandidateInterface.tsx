@@ -4,7 +4,7 @@ export interface CandidateRef {
   category: string;
 }
 
-export type CandidateRefs = CandidateRef[];  // <-- Array, not dictionary
+export type CandidateRefs = CandidateRef[];  
 
 
 export interface Candidate {

@@ -1,9 +1,51 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import styles from "./contact.module.css";
-
+import { Contact } from "@/interfaces/Contact";
 export default function ContactPage() {
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+  const[contact,setContact] = useState<Contact>({
+      name:"",
+      lastName:"",
+      asunto:"",
+      email:"",
+      mensaje:""
+  })
+
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+      setContact((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+};
+
+  const onSubmit = async (e:React.FormEvent) =>{
+    e.preventDefault();
+    console.log(contact)
+
+    try {
+      const response = await fetch(`${apiUrl}/contact`,{
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(contact),
+      })
+
+      const data = await response.json();
+      console.log('Success:', data);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+
+
   return (
     <section className={`section ${styles.contactSection}`}>
       <div className="container">
@@ -50,7 +92,7 @@ export default function ContactPage() {
 
             {/* Right side: form */}
             <div className="column is-7">
-              <form className={styles.form}>
+              <form className={styles.form} onSubmit={onSubmit}>
                 <div className="columns is-variable is-2">
                   <div className="column">
                     <div className="field">
@@ -59,10 +101,12 @@ export default function ContactPage() {
                       </label>
                       <div className="control">
                         <input
+                          value={contact.name}
                           className={`input ${styles.input}`}
                           type="text"
-                          name="firstName"
+                          name="name"
                           placeholder="Tu nombre"
+                          onChange={handleOnChange}
                         />
                       </div>
                     </div>
@@ -74,10 +118,12 @@ export default function ContactPage() {
                       </label>
                       <div className="control">
                         <input
+                          value={contact.lastName}
                           className={`input ${styles.input}`}
                           type="text"
                           name="lastName"
                           placeholder="Tus apellidos"
+                          onChange={handleOnChange}
                         />
                       </div>
                     </div>
@@ -90,11 +136,13 @@ export default function ContactPage() {
                   </label>
                   <div className="control">
                     <input
+                      value={contact.email}
                       className={`input ${styles.input}`}
                       type="email"
                       name="email"
                       placeholder="tucorreo@ejemplo.com"
                       required
+                      onChange={handleOnChange}
                     />
                   </div>
                 </div>
@@ -107,8 +155,10 @@ export default function ContactPage() {
                     <input
                       className={`input ${styles.input}`}
                       type="text"
-                      name="subject"
+                      name="asunto"
                       placeholder="Motivo del mensaje"
+                      value={contact.asunto}
+                      onChange={handleOnChange}
                     />
                   </div>
                 </div>
@@ -120,9 +170,11 @@ export default function ContactPage() {
                   <div className="control">
                     <textarea
                       className={`textarea ${styles.textarea}`}
-                      name="message"
+                      name="mensaje"
                       placeholder="Escribe tu mensaje aquí..."
                       rows={5}
+                      value={contact.mensaje}
+                      onChange={handleOnChange}
                     />
                   </div>
                 </div>

@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from src.config import Config
 from src.extensions import  cors
 from src.routes.main_routes import main_bp
@@ -11,10 +12,12 @@ import pytz
 from src.routes.google_cloud_storage import google_storage_bp
 from src.routes.parties_routes import PARTY
 from src.routes.comparison_tool import comparison_bp
+from src.routes.contact_page import contact_bp
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    # CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
     # Initialize extensions
     cors.init_app(app)
@@ -26,6 +29,7 @@ def create_app():
     app.register_blueprint(google_storage_bp)
     app.register_blueprint(PARTY)
     app.register_blueprint(comparison_bp)
+    app.register_blueprint(contact_bp)
  
     return app
 
