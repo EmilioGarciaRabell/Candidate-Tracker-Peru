@@ -81,11 +81,14 @@ def send_email_to_client(email, name):
     msg.attach(MIMEText(text, "plain"))
     msg.attach(MIMEText(html, "html"))
 
-    # Enviar el correo
-    with smtplib.SMTP("smtp.gmail.com", 587) as s:
-        s.starttls()
-        s.login(EMAIL_ID, EMAIL_PASSWORD)
-        s.sendmail(EMAIL_ID, email, msg.as_string())
+   
+
+    with smtplib.SMTP(host="mail.privateemail.com", port=587, timeout=10) as smtp_obj:
+        smtp_obj.ehlo()
+        smtp_obj.starttls()
+        smtp_obj.ehlo()
+        smtp_obj.login(EMAIL_ID, EMAIL_PASSWORD)
+        smtp_obj.sendmail(EMAIL_ID, email, msg.as_string())
 
 def get_unread():
     database_url = os.environ.get("DATABASE_URL")
@@ -220,7 +223,8 @@ def send_update_email_to_admins():
 
         msg.attach(MIMEText(html_body, "html"))
 
-        with smtplib.SMTP("smtp.gmail.com", 587) as s:
+        with smtplib.SMTP("mail.tudominio.com", 587) as s:
             s.starttls()
             s.login(EMAIL_ID, EMAIL_PASSWORD)
             s.sendmail(EMAIL_ID, admin["email"], msg.as_string())
+

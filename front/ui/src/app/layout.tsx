@@ -15,6 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Candidate Tracker Peru 2026",
+  icons: {
+    icon: "/logo2.svg",},
   description: "Keep track of all candidate data for the Peru 2026 election.",
 };
 
