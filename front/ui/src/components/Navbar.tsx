@@ -11,7 +11,6 @@ const navItems = [
   { href: "/candidates", label: "Candidatos" },
   { href: "/parties", label: "Partidos" },
   { href: "/noticias", label: "Noticias" },
-  { href: "/dashboard", label: "Tendencias" },
   { href: "/metodologias", label: "Metodologías" },
   { href: "/faq", label: "Preguntas Frequentes" },
   { href: "/about", label: "Acerca de" },

@@ -5,6 +5,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from psycopg2.extras import RealDictCursor
 import psycopg2
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import smtplib
 
 load_dotenv()
 
@@ -155,9 +158,7 @@ def get_admins():
             conn.close()
 
 def send_update_email_to_admins():
-    from email.mime.text import MIMEText
-    from email.mime.multipart import MIMEMultipart
-    import smtplib
+
 
     unread = get_unread()
     admins = get_admins()

@@ -142,12 +142,6 @@ export default function PartidoPage() {
                 </figure>
               </div>
               <div className="card-content">
-                {/* <p className="title is-6 mb-3">Historia</p>
-                {party.summary ? (
-                  <p className="is-size-7 has-text-grey">{party.summary}</p>
-                ) : (
-                  <p className="is-size-7 has-text-grey-light">No se encontro info del partido</p>
-                )} */}
               </div>
             </div>
           </aside>
