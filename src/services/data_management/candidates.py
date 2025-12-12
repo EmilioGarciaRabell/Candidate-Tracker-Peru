@@ -9,9 +9,20 @@ def get_candidates() -> list[dict]:
     return CANDIDATES_TABLE.get_candidates_with_parties()
 
 
-def get_candidate(id) -> dict:
-    """ get candidate from id """
-    candidate = CANDIDATES_TABLE.select('id, name, age, party_id, education,summary, work_experience, polemicas, ref', f"id = {id}")[0]
-    candidate["party_id"] = PARTIES_TABLE.select("name", f"id = {candidate.get('party_id')}")[0].get("name")
+def get_candidate(id: int) -> dict:
+    rows = CANDIDATES_TABLE.select(
+        'id, name, age, party_id, education, summary, work_experience, polemicas, ref',
+        "id = %s",
+        params=(id,),
+    )
+    if not rows:
+        raise KeyError(f"Candidate {id} not found")
+
+    candidate = rows[0]
+    party_rows = PARTIES_TABLE.select("name", "id = %s", params=(candidate.get("party_id"),))
+    if party_rows:
+        candidate["party_id"] = party_rows[0].get("name")
+
     return candidate
+
 

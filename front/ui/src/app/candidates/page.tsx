@@ -16,7 +16,7 @@ export default function Candidates() {
   const [partyFilter, setPartyFilter] = useState<string>("");
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
+  const normailizeName = (name?: string | null) => (name ?? "").toLowerCase();
   const fetchCandidates = async () => {
     if (!apiUrl) {
       setError("La URL de la API no está configurada (NEXT_PUBLIC_API_URL).");
@@ -55,40 +55,40 @@ export default function Candidates() {
 
 
   const filtered = useMemo(() => {
-  const q = query.trim().toLowerCase();
+    const q = query.trim().toLowerCase();
 
-  let result = candidates.filter((c) => {
-    const nameAndNicknames = [
-      c.name?.toLowerCase(),
-      ...(c.nicknames?.map((n) => n.toLowerCase()) ?? []),
-    ];
+    let result = candidates.filter((c) => {
+      const nameAndNicknames = [
+        c.name?.toLowerCase(),
+        ...(c.nicknames?.map((n) => n.toLowerCase()) ?? []),
+      ];
 
-    const matchesQuery =
-      !q ||
-      nameAndNicknames.some((field) => field?.includes(q)) ||
-      c.summary?.toLowerCase().includes(q);
+      const matchesQuery =
+        !q ||
+        nameAndNicknames.some((field) => field?.includes(q)) ||
+        c.summary?.toLowerCase().includes(q);
 
-    const matchesParty =
-      !partyFilter || String(c.party_id) === partyFilter;
+      const matchesParty =
+        !partyFilter || String(c.party_id) === partyFilter;
 
-    return matchesQuery && matchesParty;
-  });
+      return matchesQuery && matchesParty;
+    });
 
-  if (sortOption === "name-asc") {
-    result = [...result].sort((a, b) =>
-      a.name.localeCompare(b.name)
-    );
-  } else if (sortOption === "name-desc") {
-    result = [...result].sort((a, b) =>
-      b.name.localeCompare(a.name)
-    );
-  } else if (sortOption === "age-asc") {
-    result = [...result].sort((a, b) => (a.age ?? 0) - (b.age ?? 0));
-  } else if (sortOption === "age-desc") {
-    result = [...result].sort((a, b) => (b.age ?? 0) - (a.age ?? 0));
-  }
+    if (sortOption === "name-asc") {
+      result = [...result].sort((a, b) =>
+        normailizeName(a.name).localeCompare(normailizeName(b.name))
+      );
+    } else if (sortOption === "name-desc") {
+      result = [...result].sort((a, b) =>
+        normailizeName(b.name).localeCompare(normailizeName(a.name))
+      );
+    } else if (sortOption === "age-asc") {
+      result = [...result].sort((a, b) => (a.age ?? 0) - (b.age ?? 0));
+    } else if (sortOption === "age-desc") {
+      result = [...result].sort((a, b) => (b.age ?? 0) - (a.age ?? 0));
+    }
 
-  return result;
+    return result;
 }, [candidates, query, partyFilter, sortOption]);
 
 

@@ -12,3 +12,4 @@ unidecode
 transformers
 torch
 google-cloud-storage
+flask-limiter
