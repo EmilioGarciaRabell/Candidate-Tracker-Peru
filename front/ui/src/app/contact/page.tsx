@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import styles from "./contact.module.css";
 import { Contact } from "@/interfaces/Contact";
+import "bulma/css/bulma.min.css";
+
 export default function ContactPage() {
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -14,6 +16,8 @@ export default function ContactPage() {
       email:"",
       mensaje:""
   })
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -27,6 +31,7 @@ export default function ContactPage() {
   const onSubmit = async (e:React.FormEvent) =>{
     e.preventDefault();
     console.log(contact)
+    setIsModalOpen(true)
 
     try {
       const response = await fetch(`${apiUrl}/contact`,{
@@ -39,6 +44,7 @@ export default function ContactPage() {
 
       const data = await response.json();
       console.log('Success:', data);
+
     } catch (error) {
       console.log(error)
     }
@@ -188,13 +194,46 @@ export default function ContactPage() {
                     className={`button is-primary ${styles.submitButton}`}
                   >
                     Enviar
-                  </button>
+                  </button>      
                 </div>
-              </form>
+              </form>  
             </div>
           </div>
         </div>
       </div>
+       {isModalOpen && (
+  <div className="modal is-active">
+    <div
+      className={`modal-background ${styles.background}`}
+      onClick={() => setIsModalOpen(false)}
+    ></div>
+
+    <div className={`modal-card ${styles.card}`}>
+      <header className={`modal-card-head ${styles.header}`}>
+        <p className={`modal-card-title ${styles.title}`}>Mensaje enviado</p>
+      </header>
+
+      <section className={`modal-card-body ${styles.body}`}>
+        Hemos recibido tu mensaje. Nuestro equipo se comunicará contigo pronto.
+      </section>
+
+      <footer className={`modal-card-foot ${styles.footer}`}>
+        <button
+          className={`button is-primary ${styles.submitButton}`}
+          onClick={() => setIsModalOpen(false)}
+        >
+          Cerrar
+        </button>
+      </footer>
+    </div>
+
+    <button
+      className="modal-close is-large"
+      aria-label="close"
+      onClick={() => setIsModalOpen(false)}
+    ></button>
+  </div>
+)}
     </section>
   );
 }

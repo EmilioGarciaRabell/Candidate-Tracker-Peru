@@ -236,3 +236,61 @@
 .textarea::-ms-input-placeholder {
   color: #64748b !important;
 }
+
+/* Blurred background */
+.background {
+  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.35) !important;
+}
+
+.card {
+  border-radius: 18px !important;
+  overflow: hidden;
+  animation: fadeInScale 0.25s ease-out;
+  box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.25);
+}
+
+.header {
+  background: #fafafa;
+  padding: 1.4rem 1.6rem;
+  border-bottom: 1px solid #e9e9e9;
+}
+
+.title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #111;
+}
+
+
+.body {
+  padding: 1.8rem;
+  font-size: 1.05rem;
+  background-color: #fafafa;
+  color: black;
+}
+
+.footer {
+  background: #fafafa;
+  border-top: 1px solid #e9e9e9;
+  padding: 1rem 1.6rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.closeBtn {
+  border-radius: 10px !important;
+  padding: 0.6rem 1.2rem !important;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
